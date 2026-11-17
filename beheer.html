@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Dashboard zelfscankassa</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --inkt: #162746; --zacht: #5b6b85; --lijn: #e6eaf1; --aqua: #a6bada; --ijs: #f4f7fb; --groen: #1f9d68; --rood: #d14848; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', system-ui, sans-serif; color: var(--inkt); background: var(--ijs); min-height: 100vh; }
+  button, input, textarea { font: inherit; color: inherit; }
+
+  /* Inloggen */
+  #inlog { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+  .inlogkaart { background: #fff; border-radius: 26px; padding: 40px; width: min(420px, 100%); box-shadow: 0 24px 60px -30px rgba(22,39,70,.45); text-align: center; }
+  .inlogkaart h1 { font-weight: 600; font-size: 26px; margin: 10px 0 6px; }
+  .inlogkaart p { color: var(--zacht); font-size: 14px; margin-bottom: 22px; }
+
+  /* Opbouw */
+  header { background: #fff; border-bottom: 1px solid var(--lijn); position: sticky; top: 0; z-index: 5; }
+  .balk { max-width: 1100px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 24px; }
+  .merk { font-weight: 600; letter-spacing: 3px; font-size: 13px; text-transform: uppercase; }
+  .merk span { font-weight: 300; color: var(--zacht); }
+  nav { display: flex; gap: 4px; margin-left: auto; }
+  nav button { border: none; background: none; padding: 9px 16px; border-radius: 999px; cursor: pointer; font-size: 14px; color: var(--zacht); font-weight: 500; }
+  nav button.aan { background: var(--inkt); color: #fff; }
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 120px; }
+  .tab { display: none; animation: in .35s ease; } .tab.aan { display: block; }
+  @keyframes in { from { opacity: 0; transform: translateY(8px); } }
+  h2 { font-size: 28px; font-weight: 600; } .uitleg { color: var(--zacht); font-size: 14px; margin: 4px 0 24px; }
+
+  .raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  .kaart { background: #fff; border-radius: 22px; padding: 22px; border: 1px solid var(--lijn); position: relative; transition: opacity .3s; }
+  .kaart.uit { opacity: .55; }
+  .kaart .kop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .kaart .kop b { font-size: 18px; font-weight: 600; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--zacht); margin: 12px 0 5px; letter-spacing: .3px; }
+  input[type=text], textarea { width: 100%; border: 1.5px solid var(--lijn); border-radius: 12px; padding: 10px 12px; font-size: 15px; background: #fff; transition: border-color .2s; }
+  input:focus, textarea:focus { outline: none; border-color: var(--inkt); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  .tweeop { display: grid; grid-template-columns: 1fr 120px; gap: 12px; }
+  .prijsveld { position: relative; } .prijsveld input { padding-left: 28px; } .prijsveld::before { content: '€'; position: absolute; left: 12px; top: 10px; color: var(--zacht); }
+
+  /* Schakelaar */
+  .schakel { position: relative; width: 48px; height: 28px; flex: none; }
+  .schakel input { opacity: 0; width: 0; height: 0; }
+  .schakel span { position: absolute; inset: 0; background: var(--lijn); border-radius: 999px; cursor: pointer; transition: .25s; }
+  .schakel span::after { content: ''; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .25s; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+  .schakel input:checked + span { background: var(--groen); }
+  .schakel input:checked + span::after { transform: translateX(20px); }
+
+  .foto { aspect-ratio: 4/3; border-radius: 16px; background: var(--ijs) center / contain no-repeat; border: 1.5px dashed var(--lijn);
+    display: grid; place-items: center; color: var(--zacht); font-size: 13px; cursor: pointer; position: relative; overflow: hidden; }
+  .foto.heeft { border-style: solid; } .foto.heeft span { display: none; }
+  .foto input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  .knop { border: none; border-radius: 999px; padding: 12px 24px; font-weight: 600; cursor: pointer; font-size: 15px; transition: transform .15s; }
+  .knop:active { transform: scale(.97); }
+  .knop.vol { background: var(--inkt); color: #fff; }
+  .knop.rand { background: #fff; border: 1.5px solid var(--lijn); }
+  .knop.weg { background: none; color: var(--rood); padding: 8px 0; font-weight: 500; font-size: 13px; margin-top: 14px; }
+  .nieuw { border: 2px dashed var(--lijn); border-radius: 22px; display: grid; place-items: center; min-height: 260px; cursor: pointer;
+    color: var(--zacht); font-weight: 500; background: transparent; transition: border-color .2s, color .2s; }
+  .nieuw:hover { border-color: var(--inkt); color: var(--inkt); }
+  .nieuw b { display: block; font-size: 40px; font-weight: 300; text-align: center; }
+
+  /* Opslaan balk */
+  .opslaanbalk { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--inkt); color: #fff;
+    border-radius: 999px; padding: 10px 10px 10px 26px; display: flex; align-items: center; gap: 20px; box-shadow: 0 20px 40px -14px rgba(22,39,70,.6);
+    transition: transform .4s cubic-bezier(.2,.9,.3,1.2); z-index: 10; }
+  .opslaanbalk.zichtbaar { transform: translateX(-50%); }
+  .opslaanbalk .knop { background: #fff; color: var(--inkt); }
+  .melding { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 22px; border-radius: 999px; font-weight: 500; font-size: 14px;
+    display: none; z-index: 20; box-shadow: 0 10px 30px -10px rgba(0,0,0,.3); }
+  .melding.ok { display: block; background: #e3f6ed; color: #145c3e; } .melding.fout { display: block; background: #fbe6e6; color: #8a2222; }
+
+  /* Verkopen */
+  .cijfers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .cijfer { background: #fff; border-radius: 20px; padding: 20px 22px; border: 1px solid var(--lijn); }
+  .cijfer small { color: var(--zacht); font-size: 12px; letter-spacing: .5px; } .cijfer div { font-size: 30px; font-weight: 600; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid var(--lijn); }
+  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--lijn); font-size: 14px; }
+  th { font-size: 12px; color: var(--zacht); font-weight: 500; letter-spacing: .4px; background: var(--ijs); }
+  td.r, th.r { text-align: right; }
+  .label { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .label.successful { background: #e3f6ed; color: #145c3e; } .label.failed { background: #fbe6e6; color: #8a2222; } .label.pending { background: var(--ijs); color: var(--zacht); }
+</style>
+</head>
+<body>
+
+<div id="inlog">
+  <div class="inlogkaart">
+    <div class="merk">Carwash <span>Barneveld</span></div>
+    <h1>Dashboard</h1>
+    <p>Vul je beheersleutel in om programma's en producten aan te passen.</p>
+    <input type="password" id="sleutel" placeholder="Beheersleutel" autocomplete="current-password" style="width:100%;border:1.5px solid var(--lijn);border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:14px">
+    <button class="knop vol" id="inlogknop" style="width:100%">Inloggen</button>
+    <div id="inlogfout" style="color:var(--rood);font-size:14px;margin-top:12px"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header><div class="balk">
+    <div class="merk">Carwash <span>Barneveld</span></div>
+    <nav>
+      <button data-tab="producten" class="aan">Producten</button>
+      <button data-tab="programmas">Wasprogramma's</button>
+      <button data-tab="verkopen">Verkopen</button>
+      <button data-tab="instellingen">Instellingen</button>
+    </nav>
+  </div></header>
+
+  <main>
+    <section class="tab aan" id="tab-producten">
+      <h2>Producten</h2>
+      <p class="uitleg">Deze producten ziet de klant bij "Nog iets erbij?" voordat hij afrekent. Zet een product uit als het op is.</p>
+      <div class="raster" id="productenraster"></div>
+    </section>
+
+    <section class="tab" id="tab-programmas">
+      <h2>Wasprogramma's</h2>
+      <p class="uitleg">Pas namen, prijzen en wat erin zit aan. Zet een programma uit als het tijdelijk niet kan.</p>
+      <div class="raster" id="programmaraster"></div>
+    </section>
+
+    <section class="tab" id="tab-verkopen">
+      <h2>Verkopen</h2>
+      <p class="uitleg">De laatste 100 betalingen via de zelfscankassa.</p>
+      <div class="cijfers" id="cijfers"></div>
+      <table><thead><tr><th>Wanneer</th><th>Wat</th><th class="r">Bedrag</th><th>Status</th></tr></thead><tbody id="verkooplijst"></tbody></table>
+    </section>
+
+    <section class="tab" id="tab-instellingen">
+      <h2>Instellingen</h2>
+      <p class="uitleg">Teksten op de kassa.</p>
+      <div class="kaart" style="max-width:640px">
+        <label>Koffietekst (staat klein boven de knop Afrekenen, leeg laten om te verbergen)</label>
+        <input type="text" id="koffie" maxlength="200">
+      </div>
+    </section>
+  </main>
+
+  <div class="opslaanbalk" id="opslaanbalk"><span>Je hebt wijzigingen</span><button class="knop" id="opslaan">Opslaan</button></div>
+</div>
+<div class="melding" id="melding"></div>
+
+<script>
+const API = 'https://zelfscankassa.broad-tree-20cb.workers.dev';
+const VOLGORDE = ['basis', 'normaal', 'intensief', 'premium'];
+let SLEUTEL = '';
+let cat = null;
+
+const $ = id => document.getElementById(id);
+const euro = c => (c / 100).toFixed(2).replace('.', ',');
+const naarCenten = s => { const n = Math.round(parseFloat(String(s).replace(/[^\d,.-]/g, '').replace(',', '.')) * 100); return Number.isFinite(n) ? n : NaN; };
+const veilig = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+async function api(pad, body) {
+  const r = await fetch(API + pad, {
+    method: body ? 'POST' : 'GET',
+    headers: { 'Content-Type': 'application/json', 'X-Beheer-Sleutel': SLEUTEL },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(r.status === 403 ? 'De beheersleutel klopt niet.' : (d.fout || 'Fout ' + r.status));
+  return d;
+}
+
+function melding(tekst, soort) {
+  const m = $('melding'); m.textContent = tekst; m.className = 'melding ' + soort;
+  clearTimeout(m._t); m._t = setTimeout(() => m.className = 'melding', 3500);
+}
+function gewijzigd() { $('opslaanbalk').classList.add('zichtbaar'); }
+
+/* ---------- Inloggen ---------- */
+async function inloggen(sleutel) {
+  SLEUTEL = sleutel;
+  try {
+    await api('/api/beheer/check', {});
+    try { localStorage.setItem('beheer_sleutel', sleutel); } catch (e) {}
+    $('inlog').style.display = 'none'; $('app').style.display = 'block';
+    cat = await api('/api/beheer/catalogus');
+    teken();
+  } catch (e) { $('inlogfout').textContent = e.message; }
+}
+$('inlogknop').onclick = () => inloggen($('sleutel').value.trim());
+$('sleutel').addEventListener('keydown', e => { if (e.key === 'Enter') $('inlogknop').click(); });
+try { const s = localStorage.getItem('beheer_sleutel'); if (s) inloggen(s); } catch (e) {}
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('aan', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('aan', t.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'verkopen') laadVerkopen();
+});
+
+/* ---------- Tekenen ---------- */
+function teken() { tekenProducten(); tekenProgrammas(); $('koffie').value = cat.koffie || ''; }
+$('koffie').oninput = e => { cat.koffie = e.target.value; gewijzigd(); };
+
+function tekenProducten() {
+  const r = $('productenraster');
+  r.innerHTML = cat.producten.map((p, i) => `
+    <div class="kaart ${p.actief === false ? 'uit' : ''}" data-i="${i}">
+      <div class="kop"><b>${veilig(p.naam) || 'Nieuw product'}</b>
+        <label class="schakel" title="Aan of uit"><input type="checkbox" data-veld="actief" ${p.actief !== false ? 'checked' : ''}><span></span></label></div>
+      <div class="foto ${p.foto ? 'heeft' : ''}" style="${p.foto ? `background-image:url('${p.foto}')` : ''}">
+        <span>Tik om een foto te kiezen</span><input type="file" accept="image/*" data-foto></div>
+      <div class="tweeop">
+        <div><label>Naam</label><input type="text" data-veld="naam" value="${veilig(p.naam)}" maxlength="50"></div>
+        <div><label>Prijs</label><div class="prijsveld"><input type="text" inputmode="decimal" data-veld="prijs" value="${euro(p.prijs)}"></div></div>
+      </div>
+      <label>Korte omschrijving</label><input type="text" data-veld="omschrijving" value="${veilig(p.omschrijving)}" maxlength="140">
+      <button class="knop weg" data-weg>Verwijderen</button>
+    </div>`).join('') + `<button class="nieuw" id="nieuwproduct"><div><b>+</b>Product toevoegen</div></button>`;
+
+  r.querySelectorAll('.kaart').forEach(k => {
+    const p = cat.producten[+k.dataset.i];
+    k.querySelectorAll('[data-veld]').forEach(inp => {
+      const veld = inp.dataset.veld;
+      inp.addEventListener(inp.type === 'checkbox' ? 'change' : 'input', () => {
+        if (veld === 'actief') { p.actief = inp.checked; k.classList.toggle('uit', !inp.checked); }
+        else if (veld === 'prijs') p.prijs = naarCenten(inp.value);
+        else { p[veld] = inp.value; if (veld === 'naam') k.querySelector('.kop b').textContent = inp.value || 'Nieuw product'; }
+        gewijzigd();
+      });
+    });
+    k.querySelector('[data-foto]').addEventListener('change', async e => {
+      const f = e.target.files[0]; if (!f) return;
+      p.foto = await verklein(f);
+      const vak = k.querySelector('.foto'); vak.style.backgroundImage = `url('${p.foto}')`; vak.classList.add('heeft');
+      gewijzigd();
+    });
+    k.querySelector('[data-weg]').onclick = () => {
+      if (!k.dataset.zeker) { k.dataset.zeker = 1; k.querySelector('[data-weg]').textContent = 'Nog een keer tikken om te verwijderen'; return; }
+      cat.producten.splice(+k.dataset.i, 1); tekenProducten(); gewijzigd();
+    };
+  });
+  $('nieuwproduct').onclick = () => {
+    cat.producten.push({ id: 'p' + Date.now(), naam: '', prijs: 0, omschrijving: '', foto: '', actief: true });
+    tekenProducten(); gewijzigd();
+    const laatste = r.querySelectorAll('.kaart'); laatste[laatste.length - 1].querySelector('[data-veld=naam]').focus();
+  };
+}
+
+function tekenProgrammas() {
+  $('programmaraster').innerHTML = VOLGORDE.map(id => {
+    const p = cat.programmas[id];
+    return `<div class="kaart ${p.actief === false ? 'uit' : ''}" data-id="${id}">
+      <div class="kop"><b>${veilig(p.naam)}</b>
+        <label class="schakel"><input type="checkbox" data-veld="actief" ${p.actief !== false ? 'checked' : ''}><span></span></label></div>
+      <div class="tweeop">
+        <div><label>Naam</label><input type="text" data-veld="naam" value="${veilig(p.naam)}" maxlength="40"></div>
+        <div><label>Prijs</label><div class="prijsveld"><input type="text" inputmode="decimal" data-veld="prijs" value="${euro(p.prijs)}"></div></div>
+      </div>
+      <label>Korte omschrijving</label><input type="text" data-veld="kort" value="${veilig(p.kort)}" maxlength="120">
+      <label>Wat zit erin (één per regel)</label><textarea data-veld="inhoud" rows="5">${veilig((p.inhoud || []).join('\n'))}</textarea>
+      <label>Cadeau (bijvoorbeeld de geurhanger, leeg laten voor geen cadeau)</label><input type="text" data-veld="cadeau" value="${veilig(p.cadeau)}" maxlength="80">
+    </div>`;
+  }).join('');
+  document.querySelectorAll('#programmaraster .kaart').forEach(k => {
+    const p = cat.programmas[k.dataset.id];
+    k.querySelectorAll('[data-veld]').forEach(inp => {
+      const veld = inp.dataset.veld;
+      inp.addEventListener(inp.type === 'checkbox' ? 'change' : 'input', () => {
+        if (veld === 'actief') { p.actief = inp.checked; k.classList.toggle('uit', !inp.checked); }
+        else if (veld === 'prijs') p.prijs = naarCenten(inp.value);
+        else if (veld === 'inhoud') p.inhoud = inp.value.split('\n').map(s => s.trim()).filter(Boolean);
+        else { p[veld] = inp.value; if (veld === 'naam') k.querySelector('.kop b').textContent = inp.value; }
+        gewijzigd();
+      });
+    });
+  });
+}
+
+// Foto klein maken zodat de kassa snel blijft
+function verklein(bestand) {
+  return new Promise((ok, fout) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 600, s = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+      ok(c.toDataURL('image/jpeg', .82));
+    };
+    img.onerror = fout;
+    img.src = URL.createObjectURL(bestand);
+  });
+}
+
+/* ---------- Opslaan ---------- */
+$('opslaan').onclick = async () => {
+  for (const p of cat.producten) {
+    if (!p.naam.trim()) return melding('Geef elk product een naam.', 'fout');
+    if (!(p.prijs > 0)) return melding('De prijs van "' + p.naam + '" klopt niet.', 'fout');
+  }
+  for (const id of VOLGORDE) if (!(cat.programmas[id].prijs >= 0)) return melding('De prijs van ' + cat.programmas[id].naam + ' klopt niet.', 'fout');
+  $('opslaan').textContent = 'Bezig...';
+  try {
+    const res = await api('/api/beheer/catalogus', cat);
+    cat = res.catalogus; teken();
+    $('opslaanbalk').classList.remove('zichtbaar');
+    melding('Opgeslagen. De kassa laat het zien bij de volgende klant.', 'ok');
+  } catch (e) { melding(e.message, 'fout'); }
+  $('opslaan').textContent = 'Opslaan';
+};
+window.addEventListener('beforeunload', e => { if ($('opslaanbalk').classList.contains('zichtbaar')) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- Verkopen ---------- */
+async function laadVerkopen() {
+  try {
+    const { verkopen } = await api('/api/beheer/verkopen');
+    const vandaag = new Date().toDateString();
+    const gelukt = verkopen.filter(v => v.status === 'successful');
+    const vandaagGelukt = gelukt.filter(v => new Date(v.gestart).toDateString() === vandaag);
+    const som = l => l.reduce((s, v) => s + (v.bedrag || 0), 0);
+    $('cijfers').innerHTML = `
+      <div class="cijfer"><small>OMZET VANDAAG</small><div>€ ${euro(som(vandaagGelukt))}</div></div>
+      <div class="cijfer"><small>BETALINGEN VANDAAG</small><div>${vandaagGelukt.length}</div></div>
+      <div class="cijfer"><small>OMZET IN DEZE LIJST</small><div>€ ${euro(som(gelukt))}</div></div>`;
+    const tekstStatus = { successful: 'Betaald', failed: 'Mislukt', pending: 'Bezig' };
+    $('verkooplijst').innerHTML = verkopen.map(v => `<tr>
+      <td>${new Date(v.gestart).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
+      <td>${veilig([v.programma, ...(v.producten || []).map(p => p.naam)].join(' + '))}</td>
+      <td class="r">€ ${euro(v.bedrag || 0)}</td>
+      <td><span class="label ${v.status}">${tekstStatus[v.status] || v.status}</span></td></tr>`).join('') ||
+      '<tr><td colspan="4" style="color:var(--zacht)">Nog geen betalingen.</td></tr>';
+  } catch (e) { melding(e.message, 'fout'); }
+}
+</script>
+</body>
+</html>

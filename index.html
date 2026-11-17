@@ -137,6 +137,41 @@
   .actief .inhoud span { animation: op .6s var(--zacht) forwards; }
   .knoppen { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
+  /* Cadeau bij Premium */
+  .cadeau { display: none; align-items: center; gap: 22px; margin: -1vh 0 4vh; padding: 1.6vh 2.4vw 1.6vh 1.2vw; border-radius: 22px;
+    background: linear-gradient(120deg, var(--aqua-licht), #fff); border: 1px solid var(--lijn); text-align: left; }
+  .cadeau.zichtbaar { display: flex; }
+  .cadeau img { width: clamp(110px, 16vw, 170px); transform-origin: 52% 0; animation: slinger 3.6s ease-in-out infinite; filter: drop-shadow(0 10px 14px rgba(22,39,70,.18)); }
+  @keyframes slinger { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+  .cadeau .klein-kop { margin-bottom: 4px; color: var(--groen); letter-spacing: 3px; }
+  .cadeau .wat { font-size: clamp(17px, 2vw, 21px); font-weight: 500; }
+
+  /* Koffie, subtiel */
+  .koffie { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2.6vh;
+    color: var(--inkt-zacht); font-size: clamp(14px, 1.6vw, 16px); font-weight: 300; }
+  .koffie svg { width: 26px; height: 26px; flex: none; }
+  .koffie .stoom path { stroke-dasharray: 10; animation: stoom 2.4s ease-in-out infinite; opacity: .6; }
+  .koffie .stoom path:nth-child(2) { animation-delay: .5s; }
+  @keyframes stoom { 0% { stroke-dashoffset: 10; opacity: 0; } 40% { opacity: .7; } 100% { stroke-dashoffset: -10; opacity: 0; } }
+
+  /* Extra producten */
+  .producten { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 40vw), 1fr)); gap: 2vh 2vw;
+    width: min(860px, 94%); margin-top: 4vh; max-height: 46vh; overflow-y: auto; padding: 6px; }
+  .product { border: 1.5px solid var(--lijn); border-radius: 24px; padding: 1.6vh; cursor: pointer; text-align: left; position: relative;
+    transition: border-color .3s, transform .25s var(--zacht), box-shadow .3s; background: #fff; }
+  .product:active { transform: scale(.97); }
+  .product.gekozen { border-color: var(--inkt); box-shadow: 0 18px 40px -22px rgba(22,39,70,.5); }
+  .product .beeld { aspect-ratio: 4/3; border-radius: 16px; background: var(--aqua-licht) center / contain no-repeat; margin-bottom: 1.4vh; }
+  .product .naam { font-size: clamp(16px, 1.9vw, 20px); font-weight: 500; }
+  .product .oms { font-size: 13px; color: var(--inkt-zacht); font-weight: 300; margin-top: 2px; min-height: 1.2em; }
+  .product .prijs { font-size: clamp(17px, 2vw, 21px); font-weight: 600; margin-top: 1vh; }
+  .product .plus { position: absolute; top: 2.2vh; right: 2.2vh; width: 40px; height: 40px; border-radius: 50%; background: #fff;
+    border: 1.5px solid var(--lijn); display: grid; place-items: center; font-size: 22px; transition: all .3s var(--zacht); }
+  .product.gekozen .plus { background: var(--inkt); color: #fff; border-color: var(--inkt); transform: rotate(45deg); }
+  .totaalregel { margin: 4vh 0 2.6vh; font-size: clamp(18px, 2.1vw, 22px); color: var(--inkt-zacht); font-weight: 300; }
+  .totaalregel b { color: var(--inkt); font-weight: 600; font-size: 1.3em; margin-left: 8px; display: inline-block; transition: transform .3s var(--zacht); }
+  .totaalregel b.wip { transform: scale(1.15); }
+
   /* ---------- Alle programma's ---------- */
   .lijst { width: min(760px, 94%); margin-top: 4vh; border-top: 1px solid var(--lijn); }
   .regel { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 3vh 1vw; border-bottom: 1px solid var(--lijn);
@@ -263,10 +298,33 @@
   <div class="advies-prijs op d3" id="adv-prijs"></div>
   <div class="waarom op d4" id="adv-waarom"></div>
   <div class="inhoud" id="adv-inhoud"></div>
+  <div class="cadeau op d5" id="cadeau">
+    <img src="geurhanger.png" alt="">
+    <div><div class="klein-kop">Cadeau</div><div class="wat" id="cadeau-tekst"></div></div>
+  </div>
+  <div class="koffie op d6" id="koffie">
+    <svg viewBox="0 0 26 26" fill="none" stroke="#5b6b85" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <g class="stoom"><path d="M9 7c-1-1.5 1-2.5 0-4"/><path d="M13 7c-1-1.5 1-2.5 0-4"/></g>
+      <path d="M5 10h13v6a5 5 0 01-5 5H10a5 5 0 01-5-5z"/><path d="M18 12h1.5a2.5 2.5 0 010 5H18"/>
+    </svg>
+    <span id="koffie-tekst"></span>
+  </div>
   <div class="knoppen op d6">
     <button class="knop vol" id="afrekenknop">Afrekenen <span class="pijl">→</span></button>
   </div>
   <button class="linkje op d6" data-alles>Liever een ander programma</button>
+</section>
+
+<!-- Extra producten -->
+<section class="scherm" id="extra" data-stap="3">
+  <div class="klein-kop op d1">Nog iets erbij?</div>
+  <h1 class="op d2">Maak het <b>af</b></h1>
+  <div class="zin op d3">Tik aan wat je mee wilt nemen. Je haalt het op in de shop.</div>
+  <div class="producten" id="producten"></div>
+  <div class="totaalregel op d5">Totaal <b id="totaal"></b></div>
+  <div class="knoppen op d6">
+    <button class="knop vol" id="extra-afrekenen">Afrekenen <span class="pijl">→</span></button>
+  </div>
 </section>
 
 <!-- Alle programma's -->
@@ -315,17 +373,20 @@
 
 <script>
 /* ================= INSTELLINGEN ================= */
-// Prijzen in centen. Staan OOK in worker.js: pas ze op beide plekken aan.
-const PROGRAMMAS = {
-  basis:     { naam: 'Basis',     prijs: 700,  kort: '2x wassen en drogen',
-    inhoud: ['2x wassen', 'Drogen'] },
-  normaal:   { naam: 'Normaal',   prijs: 895,  kort: 'Met HD reiniger en velgen',
-    inhoud: ['HD reiniger', 'Velgenreiniging', '2x wassen', 'GlansWas of onderkant', 'Drogen'] },
-  intensief: { naam: 'Intensief', prijs: 1100, kort: 'Met insecten, actief schuim en GlansWas',
-    inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'GlansWas', 'Onderkant wassen', 'Drogen'] },
-  premium:   { naam: 'Premium',   prijs: 1395, kort: 'Alles erop en eraan, met Wax Polish',
-    inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'Onderkant wassen', 'Wax Polish', 'Drogen'] },
+// Programma's, prijzen en producten beheer je in het dashboard (beheer.html).
+// Dit zijn alleen de startwaarden voor de proefstand of als het tussenstuk even niet bereikbaar is.
+const STANDAARD = {
+  koffie: 'Even wachten? De koffie staat klaar en is altijd gratis.',
+  programmas: {
+    basis:     { naam: 'Basis',     prijs: 700,  kort: '2x wassen en drogen', actief: true, inhoud: ['2x wassen', 'Drogen'] },
+    normaal:   { naam: 'Normaal',   prijs: 895,  kort: 'Met HD reiniger en velgen', actief: true, inhoud: ['HD reiniger', 'Velgenreiniging', '2x wassen', 'GlansWas of onderkant', 'Drogen'] },
+    intensief: { naam: 'Intensief', prijs: 1100, kort: 'Met insecten, actief schuim en GlansWas', actief: true, inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'GlansWas', 'Onderkant wassen', 'Drogen'] },
+    premium:   { naam: 'Premium',   prijs: 1395, kort: 'Alles erop en eraan, met Wax Polish', actief: true, inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'Onderkant wassen', 'Wax Polish', 'Drogen'], cadeau: 'Gratis Carwash Barneveld geurhanger' },
+  },
+  producten: [],
 };
+const VOLGORDE = ['basis', 'normaal', 'intensief', 'premium'];
+let CAT = STANDAARD;
 
 // Welk programma raden we aan? vuil: 1 stoffig, 2 flink vies, 3 heel vies. extra: 1 schoon, 2 glans, 3 bescherming.
 function advies(vuil, extra) {
@@ -352,7 +413,6 @@ const MAX_WACHTEN_BETALING = 150;
   try {
     if (p.get('api')) localStorage.setItem('kassa_api', p.get('api').replace(/\/$/, ''));
     if (p.get('sleutel')) localStorage.setItem('kassa_sleutel', p.get('sleutel'));
-    // De link laten staan: een icoon op het beginscherm bewaart dan de instellingen in zijn eigen link.
   } catch (e) {}
 })();
 function lees(k) {
@@ -366,10 +426,37 @@ const SLEUTEL = lees('kassa_sleutel');
 const PROEF = !API;
 if (PROEF) document.getElementById('proef').style.display = 'block';
 
+async function api(pad, body) {
+  const r = await fetch(API + pad, {
+    method: body ? 'POST' : 'GET',
+    headers: { 'Content-Type': 'application/json', 'X-Kassa-Sleutel': SLEUTEL },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.fout || ('Fout ' + r.status));
+  return data;
+}
+
+async function laadCatalogus() {
+  if (PROEF) {
+    // In de proefstand twee voorbeeldproducten, zodat je de stap 'Nog iets erbij?' kunt zien
+    CAT = Object.assign({}, STANDAARD, { producten: [
+      { id: 'v1', naam: 'Geurhanger', prijs: 295, omschrijving: 'Voorbeeldproduct', foto: 'geurhanger.png', actief: true },
+      { id: 'v2', naam: 'Velgenreiniger', prijs: 1295, omschrijving: 'Voorbeeldproduct', foto: '', actief: true },
+    ] });
+  } else {
+    try { CAT = await api('/api/catalogus'); } catch (e) { console.log('catalogus niet geladen', e); }
+  }
+  bouwLijst();
+}
+
 /* ================= SCHERMEN ================= */
-let gekozen = null, antwoorden = {}, transactieId = null;
+let gekozen = null, antwoorden = {}, mandje = new Set(), transactieId = null;
 let pollTimer = null, rustTimer = null, aftelTimer = null, betaalStart = 0;
 const euro = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
+const veilig = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const actieveProducten = () => (CAT.producten || []).filter(p => p.actief !== false);
+const totaal = () => (gekozen ? gekozen.prijs : 0) + actieveProducten().filter(p => mandje.has(p.id)).reduce((s, p) => s + p.prijs, 0);
 
 function groet() {
   const u = new Date().getHours();
@@ -386,7 +473,7 @@ function naar(id) {
   document.getElementById('stop').classList.toggle('zichtbaar', stap >= 1 && stap <= 3);
   clearTimeout(aftelTimer);
   document.body.classList.toggle('op-welkom', id === 'welkom');
-  if (id === 'welkom') { gekozen = null; antwoorden = {}; groet(); wisKeuzes(); }
+  if (id === 'welkom') { gekozen = null; antwoorden = {}; mandje = new Set(); groet(); wisKeuzes(); laadCatalogus(); }
   resetRust();
 }
 
@@ -395,7 +482,7 @@ function wisKeuzes() { document.querySelectorAll('.optie.gekozen').forEach(o => 
 function resetRust() {
   clearTimeout(rustTimer);
   const s = document.querySelector('.scherm.actief');
-  if (s && ['vraag1', 'vraag2', 'advies', 'alles'].includes(s.id)) rustTimer = setTimeout(() => naar('welkom'), TERUG_NAAR_START_NA * 1000);
+  if (s && ['vraag1', 'vraag2', 'advies', 'alles', 'extra'].includes(s.id)) rustTimer = setTimeout(() => naar('welkom'), TERUG_NAAR_START_NA * 1000);
 }
 document.addEventListener('pointerdown', resetRust, { passive: true });
 
@@ -404,52 +491,88 @@ document.getElementById('stop').addEventListener('click', () => naar('welkom'));
 document.querySelectorAll('[data-naar]').forEach(k => k.addEventListener('click', () => naar(k.dataset.naar)));
 document.querySelectorAll('[data-alles]').forEach(k => k.addEventListener('click', () => naar('alles')));
 
-// Vragen beantwoorden
 document.querySelectorAll('.opties').forEach(groep => {
   groep.querySelectorAll('.optie').forEach(o => o.addEventListener('click', () => {
     groep.querySelectorAll('.optie').forEach(x => x.classList.remove('gekozen'));
     o.classList.add('gekozen');
     antwoorden[groep.dataset.vraag] = +o.dataset.waarde;
-    setTimeout(() => {
-      if (groep.dataset.vraag === 'vuil') naar('vraag2');
-      else toonAdvies();
-    }, 450);
+    setTimeout(() => { if (groep.dataset.vraag === 'vuil') naar('vraag2'); else toonAdvies(); }, 450);
   }));
 });
 
 function toonAdvies() {
   const a = advies(antwoorden.vuil || 1, antwoorden.extra || 1);
-  kies(a.id, a.waarom);
+  let id = a.id;
+  if (!CAT.programmas[id] || CAT.programmas[id].actief === false) {
+    // Aangeraden programma staat uit: neem het dichtstbijzijnde programma dat wel aan staat
+    const i = VOLGORDE.indexOf(id);
+    id = [...VOLGORDE.slice(0, i).reverse(), ...VOLGORDE.slice(i + 1)].find(x => CAT.programmas[x] && CAT.programmas[x].actief !== false);
+    return kies(id);
+  }
+  kies(id, a.waarom);
 }
 
 function kies(id, waarom) {
-  gekozen = Object.assign({ id }, PROGRAMMAS[id]);
+  if (!id) return naar('alles');
+  gekozen = Object.assign({ id }, CAT.programmas[id]);
+  mandje = new Set();
   document.getElementById('adv-naam').textContent = gekozen.naam;
   document.getElementById('adv-prijs').innerHTML = euro(gekozen.prijs) + '<small>incl. btw</small>';
   document.getElementById('adv-waarom').textContent = waarom || gekozen.kort;
-  document.getElementById('adv-inhoud').innerHTML = gekozen.inhoud.map((x, i) =>
-    `<span style="animation-delay:${0.55 + i * 0.06}s">${x}</span>`).join('');
+  document.getElementById('adv-inhoud').innerHTML = (gekozen.inhoud || []).map((x, i) =>
+    `<span style="animation-delay:${0.55 + i * 0.06}s">${veilig(x)}</span>`).join('');
   document.querySelector('#advies .klein-kop').textContent = waarom ? 'Ons advies voor jou' : 'Jouw keuze';
+  const cadeau = document.getElementById('cadeau');
+  cadeau.classList.toggle('zichtbaar', !!gekozen.cadeau);
+  document.getElementById('cadeau-tekst').textContent = gekozen.cadeau || '';
+  document.getElementById('koffie').style.display = CAT.koffie ? 'flex' : 'none';
+  document.getElementById('koffie-tekst').textContent = CAT.koffie || '';
   naar('advies');
 }
 
-// Lijst met alle programma's
-document.getElementById('lijst').innerHTML = Object.entries(PROGRAMMAS).map(([id, p], i) =>
-  `<div class="regel op d${i + 3}" data-id="${id}"><div><div class="naam">${p.naam}</div><div class="wat">${p.kort}</div></div><div class="prijs">${euro(p.prijs)}</div></div>`).join('');
-document.querySelectorAll('.regel').forEach(r => r.addEventListener('click', () => kies(r.dataset.id)));
-
-/* ================= BETALEN ================= */
-async function api(pad, body) {
-  const r = await fetch(API + pad, {
-    method: body ? 'POST' : 'GET',
-    headers: { 'Content-Type': 'application/json', 'X-Kassa-Sleutel': SLEUTEL },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(data.fout || ('Fout ' + r.status));
-  return data;
+function bouwLijst() {
+  const lijst = document.getElementById('lijst');
+  lijst.innerHTML = VOLGORDE.filter(id => CAT.programmas[id] && CAT.programmas[id].actief !== false).map((id, i) => {
+    const p = CAT.programmas[id];
+    return `<div class="regel op d${i + 3}" data-id="${id}"><div><div class="naam">${veilig(p.naam)}</div><div class="wat">${veilig(p.kort)}</div></div><div class="prijs">${euro(p.prijs)}</div></div>`;
+  }).join('');
+  lijst.querySelectorAll('.regel').forEach(r => r.addEventListener('click', () => kies(r.dataset.id)));
 }
 
+// Extra producten
+function toonExtra() {
+  const lijst = actieveProducten();
+  if (!lijst.length) return startBetaling();
+  const vak = document.getElementById('producten');
+  vak.innerHTML = lijst.map((p, i) => `
+    <div class="product op d${Math.min(6, i + 3)}" data-id="${veilig(p.id)}">
+      <div class="beeld" style="${p.foto ? `background-image:url('${p.foto}')` : ''}"></div>
+      <div class="plus">+</div>
+      <div class="naam">${veilig(p.naam)}</div>
+      <div class="oms">${veilig(p.omschrijving)}</div>
+      <div class="prijs">${euro(p.prijs)}</div>
+    </div>`).join('');
+  vak.querySelectorAll('.product').forEach(k => k.addEventListener('click', () => {
+    const id = k.dataset.id;
+    mandje.has(id) ? mandje.delete(id) : mandje.add(id);
+    k.classList.toggle('gekozen', mandje.has(id));
+    werkTotaalBij();
+  }));
+  werkTotaalBij();
+  naar('extra');
+}
+function werkTotaalBij() {
+  const b = document.getElementById('totaal');
+  b.textContent = euro(totaal());
+  b.classList.add('wip'); setTimeout(() => b.classList.remove('wip'), 250);
+  document.getElementById('extra-afrekenen').innerHTML = (mandje.size ? 'Afrekenen ' : 'Nee, alleen wassen ') + '<span class="pijl">→</span>';
+}
+
+document.getElementById('afrekenknop').addEventListener('click', toonExtra);
+document.getElementById('extra-afrekenen').addEventListener('click', startBetaling);
+document.getElementById('opnieuw').addEventListener('click', startBetaling);
+
+/* ================= BETALEN ================= */
 function telOp(el, doel) {
   const start = performance.now(), duur = 1100;
   (function stap(t) {
@@ -469,7 +592,7 @@ function zetBetaalTekst(titel, tekst, klaar) {
 async function startBetaling() {
   if (!gekozen) return naar('vraag1');
   naar('betalen');
-  telOp(document.getElementById('betaal-bedrag'), gekozen.prijs);
+  telOp(document.getElementById('betaal-bedrag'), totaal());
   zetBetaalTekst('Een <b>moment</b>', 'Het pinapparaat wordt klaargezet', false);
   betaalStart = Date.now();
 
@@ -480,8 +603,9 @@ async function startBetaling() {
     return;
   }
   try {
-    const res = await api('/api/afrekenen', { programma: gekozen.id });
+    const res = await api('/api/afrekenen', { programma: gekozen.id, producten: [...mandje] });
     transactieId = res.id;
+    if (res.totaal && res.totaal !== totaal()) telOp(document.getElementById('betaal-bedrag'), res.totaal);
     zetBetaalTekst('Betaal op het <b>pinapparaat</b>', 'Houd je pas of telefoon tegen het pinapparaat', true);
     pollTimer = setInterval(controleer, 1500);
   } catch (e) {
@@ -489,8 +613,6 @@ async function startBetaling() {
     uitslag('failed', 'Het pinapparaat is nu niet bereikbaar. Vraag even hulp bij de balie.');
   }
 }
-document.getElementById('afrekenknop').addEventListener('click', startBetaling);
-document.getElementById('opnieuw').addEventListener('click', startBetaling);
 
 async function controleer() {
   if (Date.now() - betaalStart > MAX_WACHTEN_BETALING * 1000) return annuleer(true);
@@ -519,9 +641,12 @@ document.getElementById('annuleer').addEventListener('click', () => annuleer(fal
 function uitslag(status, tekst) {
   clearInterval(pollTimer);
   if (status === 'successful') {
-    document.getElementById('gelukt-prog').textContent = gekozen.naam + ' · ' + euro(gekozen.prijs);
-    document.getElementById('gelukt-stappen').innerHTML = STAPPEN_NA_BETALEN.map((s, i) =>
-      `<div class="stap" style="animation-delay:${1.1 + i * 0.15}s"><b>0${i + 1}</b>${s}</div>`).join('');
+    const extra = actieveProducten().filter(p => mandje.has(p.id));
+    document.getElementById('gelukt-prog').textContent = [gekozen.naam, ...extra.map(p => p.naam)].join(' + ') + ' · ' + euro(totaal());
+    const stappen = [...STAPPEN_NA_BETALEN];
+    if (extra.length || gekozen.cadeau) stappen.splice(1, 0, 'Haal ' + (extra.length ? 'je producten' : 'je geurhanger') + ' op in de shop');
+    document.getElementById('gelukt-stappen').innerHTML = stappen.map((s, i) =>
+      `<div class="stap" style="animation-delay:${1.1 + i * 0.15}s"><b>0${i + 1}</b>${veilig(s)}</div>`).join('');
     document.getElementById('bonnr').textContent = 'BONNUMMER ' + String(transactieId).slice(-6).toUpperCase();
     naar('gelukt');
     aftellen('tijd-ok');
@@ -559,6 +684,7 @@ setInterval(maakDruppel, 350);
 
 document.body.classList.add('op-welkom');
 groet();
+laadCatalogus();
 </script>
 </body>
 </html>
