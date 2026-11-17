@@ -7,355 +7,339 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Zelfscankassa Carwash Barneveld</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #162746;
-    --navy-2: #24406f;
+    --inkt: #162746;
+    --inkt-zacht: #5b6b85;
+    --lijn: #e6eaf1;
     --aqua: #a6bada;
-    --aqua-2: #cfdcee;
-    --ijs: #eef3fa;
+    --aqua-licht: #f1f5fa;
     --wit: #ffffff;
-    --groen: #23a26d;
-    --rood: #d64545;
-    --schaduw: 0 18px 40px -14px rgba(22,39,70,.35);
+    --groen: #1f9d68;
+    --rood: #d14848;
+    --zacht: cubic-bezier(.22,.8,.25,1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
-  body {
-    font-family: 'Poppins', system-ui, sans-serif;
-    color: var(--navy);
-    background: linear-gradient(180deg, #f7faff 0%, var(--ijs) 45%, var(--aqua-2) 100%);
-    user-select: none; -webkit-user-select: none; touch-action: manipulation;
-  }
+  body { font-family: 'Poppins', system-ui, sans-serif; background: var(--wit); color: var(--inkt);
+    user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-font-smoothing: antialiased; }
 
-  /* ---------- Achtergrond: bellen en golven ---------- */
-  #bellen { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .bel { position: absolute; bottom: -80px; border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(166,186,218,.35) 60%, rgba(166,186,218,.15));
-    border: 1.5px solid rgba(255,255,255,.8);
-    box-shadow: inset -4px -6px 10px rgba(22,39,70,.06);
-    animation: stijg linear forwards; }
-  @keyframes stijg {
-    0%   { transform: translate(0, 0) scale(.6); opacity: 0; }
-    10%  { opacity: 1; }
-    50%  { transform: translate(var(--zwaai), -55vh) scale(1); }
-    100% { transform: translate(0, -115vh) scale(1.1); opacity: 0; }
-  }
-  .golven { position: fixed; left: 0; right: 0; bottom: 0; height: 16vh; z-index: 0; pointer-events: none; }
-  .golven svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
-  .golf1 { animation: golf 14s linear infinite; opacity: .55; }
-  .golf2 { animation: golf 9s linear infinite reverse; opacity: .8; }
-  .golf3 { animation: golf 20s linear infinite; }
-  @keyframes golf { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  /* Zachte lichtvlek op de achtergrond */
+  .licht { position: fixed; width: 90vmax; height: 90vmax; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(166,186,218,.28), transparent 60%); filter: blur(10px);
+    top: -45vmax; right: -35vmax; animation: zweef 18s ease-in-out infinite alternate; }
+  .licht.twee { top: auto; bottom: -55vmax; left: -40vmax; right: auto; animation-duration: 24s; opacity: .7; }
+  @keyframes zweef { to { transform: translate(-8vmax, 6vmax) scale(1.08); } }
 
-  /* ---------- Schermen ---------- */
-  .scherm { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column;
-    padding: 3.5vh 5vw 18vh; visibility: hidden; opacity: 0; transform: translateX(60px) scale(.98);
-    transition: opacity .45s ease, transform .55s cubic-bezier(.2,.9,.25,1.15), visibility 0s .5s; }
-  .scherm.actief { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
-  .scherm.weg { transform: translateX(-60px) scale(.98); }
+  /* Bovenrand */
+  .kop { position: fixed; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+    padding: 3.2vh 5vw; }
+  .merk { font-weight: 600; letter-spacing: 3px; font-size: 13px; text-transform: uppercase; }
+  .merk span { color: var(--inkt-zacht); font-weight: 300; }
+  .stop { font: inherit; font-size: 14px; font-weight: 500; color: var(--inkt-zacht); background: none; border: none;
+    padding: 10px 4px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .4s; }
+  .stop.zichtbaar { opacity: 1; pointer-events: auto; }
+  .voortgang { position: fixed; top: 0; left: 0; height: 3px; background: var(--inkt); z-index: 6; width: 0; transition: width .8s var(--zacht); }
 
-  .bovenbalk { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .merk { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: clamp(18px, 2.3vw, 26px); }
-  .merk .stip { width: 38px; height: 38px; border-radius: 12px; background: var(--navy); display: grid; place-items: center; }
-  .merk span { color: var(--navy-2); font-weight: 500; }
+  /* Schermen */
+  .scherm { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 12vh 7vw 8vh; text-align: center; visibility: hidden; opacity: 0; filter: blur(8px); transform: scale(1.02);
+    transition: opacity .6s var(--zacht), filter .6s var(--zacht), transform .7s var(--zacht), visibility 0s .6s; }
+  .scherm.actief { visibility: visible; opacity: 1; filter: none; transform: none; transition-delay: 0s; }
 
-  /* Voortgang */
-  .voortgang { display: flex; gap: 10px; align-items: center; margin: 3vh 0 2vh; }
-  .vstap { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: clamp(13px, 1.5vw, 17px); color: rgba(22,39,70,.4); transition: color .4s; }
-  .vstap i { width: 34px; height: 34px; border-radius: 50%; background: var(--wit); border: 2px solid var(--aqua);
-    display: grid; place-items: center; font-style: normal; font-weight: 700; transition: all .4s; }
-  .vstap.nu { color: var(--navy); }
-  .vstap.nu i { background: var(--navy); color: var(--wit); border-color: var(--navy); transform: scale(1.15); box-shadow: 0 0 0 6px rgba(22,39,70,.12); }
-  .vstap.klaar { color: var(--navy); }
-  .vstap.klaar i { background: var(--aqua); border-color: var(--aqua); color: var(--navy); }
-  .vlijn { flex: 1; height: 4px; border-radius: 4px; background: rgba(166,186,218,.5); position: relative; overflow: hidden; }
-  .vlijn::after { content: ''; position: absolute; inset: 0; background: var(--navy); transform: scaleX(0); transform-origin: left; transition: transform .6s ease; }
-  .vlijn.vol::after { transform: scaleX(1); }
+  /* Elementen komen rustig omhoog */
+  .op { opacity: 0; transform: translateY(24px); }
+  .actief .op { animation: op .9s var(--zacht) forwards; }
+  .actief .op.d1 { animation-delay: .1s; } .actief .op.d2 { animation-delay: .22s; } .actief .op.d3 { animation-delay: .34s; }
+  .actief .op.d4 { animation-delay: .46s; } .actief .op.d5 { animation-delay: .58s; } .actief .op.d6 { animation-delay: .7s; }
+  @keyframes op { to { opacity: 1; transform: none; } }
 
-  h1 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.05; letter-spacing: -1px; }
-  .onder { color: var(--navy-2); font-size: clamp(16px, 2vw, 22px); margin-top: 1vh; font-weight: 500; }
+  .klein-kop { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: var(--inkt-zacht); font-weight: 500; margin-bottom: 2.4vh; }
+  h1 { font-size: clamp(40px, 6.6vw, 84px); font-weight: 300; line-height: 1.05; letter-spacing: -2px; }
+  h1 b { font-weight: 600; }
+  .zin { margin-top: 2vh; font-size: clamp(17px, 2vw, 22px); font-weight: 300; color: var(--inkt-zacht); }
 
-  .knop { border: none; font-family: inherit; font-weight: 700; cursor: pointer; border-radius: 22px;
-    font-size: clamp(20px, 2.5vw, 28px); padding: 2.8vh 3vw; position: relative; overflow: hidden;
-    transition: transform .15s; }
+  .knop { font: inherit; border: none; cursor: pointer; border-radius: 999px; font-weight: 500;
+    font-size: clamp(18px, 2.1vw, 22px); padding: 2.2vh 4.6vw; transition: transform .2s var(--zacht), box-shadow .3s; }
   .knop:active { transform: scale(.96); }
-  .knop.donker { background: var(--navy); color: var(--wit); box-shadow: var(--schaduw); }
-  .knop.licht { background: var(--wit); color: var(--navy); border: 2px solid var(--aqua-2); }
-  .knop.klein { font-size: 17px; padding: 14px 26px; border-radius: 16px; }
-  .rimpel { position: absolute; border-radius: 50%; background: rgba(166,186,218,.55); transform: scale(0);
-    animation: rimpel .6s ease-out forwards; pointer-events: none; }
-  @keyframes rimpel { to { transform: scale(4); opacity: 0; } }
+  .knop.vol { background: var(--inkt); color: var(--wit); box-shadow: 0 16px 34px -16px rgba(22,39,70,.55); }
+  .knop.rand { background: var(--wit); color: var(--inkt); border: 1.5px solid var(--lijn); }
+  .knop .pijl { display: inline-block; margin-left: 12px; transition: transform .3s var(--zacht); }
+  .knop.vol .pijl { animation: duw 2.4s ease-in-out infinite; }
+  @keyframes duw { 0%, 60%, 100% { transform: none; } 30% { transform: translateX(6px); } }
+  .linkje { font: inherit; background: none; border: none; color: var(--inkt-zacht); font-size: 16px; margin-top: 2.4vh;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: var(--lijn); padding: 8px; }
 
-  /* ---------- 1. Welkom ---------- */
-  #welkom { justify-content: center; align-items: center; text-align: center; cursor: pointer; }
-  .wasstraat { width: min(560px, 80vw); height: auto; margin-bottom: 3vh; overflow: visible; }
-  .borstel { transform-box: fill-box; transform-origin: center; animation: draai 1.1s linear infinite; }
-  .borstel.links { animation-direction: reverse; }
-  @keyframes draai { to { transform: rotate(360deg); } }
-  .auto { animation: rijden 6s cubic-bezier(.45,0,.55,1) infinite; }
-  @keyframes rijden {
-    0% { transform: translateX(-340px); } 35%, 60% { transform: translateX(0); } 100% { transform: translateX(340px); }
-  }
-  .wielen circle { transform-box: fill-box; transform-origin: center; animation: draai .6s linear infinite; }
-  .drup { animation: drup 1s ease-in infinite; opacity: 0; }
-  @keyframes drup { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
-  .titel span { display: inline-block; opacity: 0; transform: translateY(30px) rotate(6deg); animation: letter .6s cubic-bezier(.2,.9,.3,1.3) forwards; }
-  @keyframes letter { to { opacity: 1; transform: none; } }
-  .slogan { margin-top: 1.5vh; font-size: clamp(18px, 2.4vw, 28px); font-weight: 600; color: var(--navy-2); opacity: 0; animation: infaden 1s 1.2s forwards; }
-  @keyframes infaden { to { opacity: 1; } }
-  .start { margin-top: 5vh; position: relative; display: inline-flex; align-items: center; gap: 16px;
-    background: var(--navy); color: var(--wit); font-weight: 800; font-size: clamp(22px, 3vw, 34px);
-    padding: 2.6vh 5.5vw; border-radius: 999px; box-shadow: var(--schaduw); opacity: 0; animation: infaden .8s 1.6s forwards; }
-  .start::before, .start::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 3px solid var(--navy); animation: ring 2.4s infinite; }
-  .start::after { animation-delay: 1.2s; }
-  @keyframes ring { from { transform: scale(1); opacity: .7; } to { transform: scale(1.35, 1.7); opacity: 0; } }
-  .start .hand { display: inline-block; animation: tik 1.4s ease-in-out infinite; }
-  @keyframes tik { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px) rotate(-8deg); } }
-
-  /* ---------- 2. Kies ---------- */
-  .tegels { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2.2vh 2.2vw; margin-top: 3vh; }
-  .tegel { background: var(--wit); border-radius: 28px; padding: 2.6vh 2.4vw; box-shadow: var(--schaduw);
-    display: flex; flex-direction: column; position: relative; overflow: hidden; cursor: pointer;
-    opacity: 0; transform: translateY(50px) scale(.95); transition: box-shadow .2s; }
-  .actief .tegel { animation: tegelIn .7s cubic-bezier(.2,.9,.3,1.25) forwards; }
-  @keyframes tegelIn { to { opacity: 1; transform: none; } }
-  .tegel:active { transform: scale(.97) !important; }
-  .tegel.donker { background: linear-gradient(150deg, var(--navy), var(--navy-2)); color: var(--wit); }
-  .tegel .niveau { display: flex; gap: 6px; margin-bottom: 1.6vh; }
-  .tegel .niveau b { width: 22px; height: 22px; border-radius: 50%; background: var(--aqua-2); }
-  .tegel .niveau b.aan { background: var(--aqua); box-shadow: inset 0 0 0 3px rgba(255,255,255,.6); animation: knipper 2.4s infinite; }
-  .tegel.donker .niveau b { background: rgba(255,255,255,.15); }
-  .tegel.donker .niveau b.aan { background: var(--aqua); }
-  @keyframes knipper { 0%,100% { transform: scale(1); } 50% { transform: scale(1.18); } }
-  .tegel .naam { font-size: clamp(26px, 3.4vw, 42px); font-weight: 900; line-height: 1; }
-  .tegel .prijs { margin-top: auto; padding-top: 1.6vh; font-size: clamp(34px, 4.6vw, 58px); font-weight: 900; letter-spacing: -1px; }
-  .tegel .prijs small { font-size: .45em; font-weight: 600; opacity: .6; margin-right: 4px; }
-  .tegel .kort { font-size: clamp(13px, 1.5vw, 17px); margin-top: 1vh; opacity: .75; line-height: 1.4; }
-  .tegel .sticker { position: absolute; top: 20px; right: -42px; transform: rotate(35deg); background: var(--aqua);
-    color: var(--navy); font-weight: 800; font-size: 13px; padding: 6px 50px; letter-spacing: .5px; }
-  .tegel .glans { position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
-    background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: skewX(-20deg);
-    animation: glans 4.5s ease-in-out infinite; }
-  .tegel:nth-child(2) .glans { animation-delay: .8s; } .tegel:nth-child(3) .glans { animation-delay: 1.6s; } .tegel:nth-child(4) .glans { animation-delay: 2.4s; }
-  @keyframes glans { 0%, 60% { left: -60%; } 100% { left: 140%; } }
-
-  /* ---------- 3. Controleren ---------- */
-  .controle { flex: 1; display: grid; grid-template-columns: 1fr; place-items: center; }
-  .bon { background: var(--wit); width: min(640px, 92%); border-radius: 30px; padding: 4vh 4vw; box-shadow: var(--schaduw); position: relative; }
-  .actief .bon { animation: bonIn .7s cubic-bezier(.2,.9,.3,1.2); }
-  @keyframes bonIn { from { opacity: 0; transform: perspective(900px) rotateX(-25deg) translateY(40px); } }
-  .bon .kop { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px dashed var(--aqua-2); padding-bottom: 2vh; }
-  .bon .naam { font-size: clamp(28px, 3.6vw, 44px); font-weight: 900; }
-  .bon .prijs { font-size: clamp(32px, 4.4vw, 54px); font-weight: 900; }
-  .bon ul { list-style: none; margin-top: 2vh; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2vh 2vw; }
-  .bon li { display: flex; align-items: center; gap: 12px; font-size: clamp(15px, 1.8vw, 20px); font-weight: 500; opacity: 0; transform: translateX(-16px); }
-  .actief .bon li { animation: regel .45s ease forwards; }
-  @keyframes regel { to { opacity: 1; transform: none; } }
-  .bon li .v { width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--aqua-2); display: grid; place-items: center; }
-  .bon li .v svg { width: 16px; height: 16px; }
-  .bon li .v path { stroke-dasharray: 20; stroke-dashoffset: 20; }
-  .actief .bon li .v path { animation: teken .4s ease forwards; animation-delay: inherit; }
-  .knoppenrij { display: flex; gap: 2vw; width: min(640px, 92%); margin-top: 3vh; }
-  .knoppenrij .knop { flex: 1; }
-  .knoppenrij .knop.donker { flex: 1.6; }
-
-  /* ---------- 4. Betalen ---------- */
-  #betalen { align-items: center; text-align: center; justify-content: center; }
-  .pinbeeld { width: min(360px, 52vw); margin-bottom: 2vh; overflow: visible; }
-  .pinbeeld .golfje { fill: none; stroke: var(--navy); stroke-width: 5; stroke-linecap: round; opacity: 0; animation: nfc 1.8s infinite; }
-  .pinbeeld .golfje:nth-of-type(2) { animation-delay: .3s; } .pinbeeld .golfje:nth-of-type(3) { animation-delay: .6s; }
-  @keyframes nfc { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
-  .pinbeeld .pasje { animation: pasje 2.2s ease-in-out infinite; }
-  @keyframes pasje { 0%,100% { transform: translate(60px,-30px) rotate(12deg); } 50% { transform: translate(10px, 10px) rotate(0); } }
-  .bedrag { font-size: clamp(64px, 10vw, 130px); font-weight: 900; letter-spacing: -3px; line-height: 1; margin: 1.5vh 0; }
-  .pijl { margin-top: 3vh; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--navy-2); font-weight: 700; }
-  .pijl svg { width: 46px; height: 46px; animation: pijl 1.2s ease-in-out infinite; }
-  @keyframes pijl { 0%,100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
-  .wachtbalk { width: min(420px, 70vw); height: 10px; border-radius: 10px; background: rgba(166,186,218,.45); overflow: hidden; margin-top: 3vh; }
-  .wachtbalk div { height: 100%; width: 35%; border-radius: 10px; background: var(--navy); animation: heen 1.4s ease-in-out infinite; }
-  @keyframes heen { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
-
-  /* ---------- 5. Uitslag ---------- */
-  .uitslag { align-items: center; justify-content: center; text-align: center; }
-  .groot-icoon { width: 30vmin; height: 30vmin; margin-bottom: 3vh; }
-  .groot-icoon .cirkel { stroke-dasharray: 340; stroke-dashoffset: 340; }
-  .groot-icoon .teken { stroke-dasharray: 120; stroke-dashoffset: 120; }
-  .actief .groot-icoon .cirkel { animation: teken .7s ease forwards; }
-  .actief .groot-icoon .teken { animation: teken .5s .6s ease forwards; }
-  .actief .groot-icoon .vulling { animation: vul .5s .5s ease forwards; }
-  .groot-icoon .vulling { transform-box: fill-box; transform-origin: center; transform: scale(0); }
+  /* ---------- Welkom met foto ---------- */
+  #welkom { cursor: pointer; justify-content: flex-end; padding: 0 7vw 9vh; color: var(--wit); overflow: hidden; z-index: 8; }
+  #welkom .foto { position: absolute; inset: -2%; background: url('foto.jpg') center 40% / cover no-repeat; transform: scale(1.12); }
+  #welkom.actief .foto { animation: zoom 22s ease-out forwards; }
+  @keyframes zoom { from { transform: scale(1.18); } to { transform: scale(1.02); } }
+  #welkom .donker { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 45%, rgba(10,8,4,.78) 100%); }
+  #welkom .zon { position: absolute; left: 47%; top: 30%; width: 46vmin; height: 46vmin; border-radius: 50%; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255,214,140,.55), rgba(255,190,90,0) 65%); mix-blend-mode: screen; animation: zonpuls 5s ease-in-out infinite; }
+  @keyframes zonpuls { 50% { opacity: .55; transform: translate(-50%, -50%) scale(1.15); } }
+  #welkom .druppel { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,230,180,.95), rgba(255,210,140,0) 70%);
+    mix-blend-mode: screen; animation: drijf linear infinite; opacity: 0; }
+  @keyframes drijf { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: .9; } 85% { opacity: .6; } 100% { opacity: 0; transform: translateY(-22vh) translateX(3vw); } }
+  #welkom .tekst { position: relative; z-index: 2; }
+  #welkom .klein-kop { color: rgba(255,255,255,.75); }
+  #welkom h1 { font-size: clamp(48px, 8vw, 104px); text-shadow: 0 4px 30px rgba(0,0,0,.35); }
+  #welkom .zin { color: rgba(255,255,255,.82); }
+  #welkom .knop.vol { background: var(--wit); color: var(--inkt); box-shadow: 0 18px 40px -12px rgba(0,0,0,.5); }
+  #welkom .slogan { position: absolute; z-index: 2; top: 3.2vh; right: 5vw; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.85); font-weight: 500; }
+  #welkom .logo-wit { position: absolute; z-index: 2; top: 3.2vh; left: 5vw; font-weight: 600; letter-spacing: 3px; font-size: 13px; text-transform: uppercase; }
+  #welkom .logo-wit span { font-weight: 300; opacity: .8; }
+  body.op-welkom .kop { opacity: 0; }
+  .kop { transition: opacity .5s; }
+  .auto { width: min(640px, 82vw); margin-bottom: 5vh; overflow: visible; }
+  .auto .lijnwerk { fill: none; stroke: var(--inkt); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1600; stroke-dashoffset: 1600; }
+  .actief .auto .lijnwerk { animation: teken 2.6s var(--zacht) forwards; }
+  .actief .auto .lijnwerk.ruit { animation-delay: .6s; }
+  .actief .auto .lijnwerk.wiel { animation-delay: 1s; }
   @keyframes teken { to { stroke-dashoffset: 0; } }
-  @keyframes vul { to { transform: scale(1); } }
-  .actief .schud { animation: schud .5s 1.1s; }
-  @keyframes schud { 20%,60% { transform: translateX(-12px); } 40%,80% { transform: translateX(12px); } }
-  .uitslag h1 { opacity: 0; } .actief.uitslag h1 { animation: omhoog .6s .8s forwards; }
-  @keyframes omhoog { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-  .stappen { margin-top: 3vh; width: min(640px, 92%); display: grid; gap: 1.4vh; }
-  .stap { background: var(--wit); border-radius: 20px; padding: 2vh 2vw; display: flex; align-items: center; gap: 18px;
-    text-align: left; font-size: clamp(16px, 2vw, 22px); font-weight: 500; box-shadow: 0 10px 24px -14px rgba(22,39,70,.35);
-    opacity: 0; transform: translateY(20px); }
-  .actief .stap { animation: omhoog .5s forwards; }
-  .stap b { width: 44px; height: 44px; flex: none; border-radius: 14px; background: var(--navy); color: var(--wit); display: grid; place-items: center; font-weight: 800; }
-  .klein-grijs { margin-top: 2vh; color: var(--navy-2); font-size: 16px; font-weight: 500; }
-  .aftel { width: min(320px, 60vw); height: 6px; border-radius: 6px; background: rgba(166,186,218,.5); margin: 2vh auto 0; overflow: hidden; }
-  .aftel div { height: 100%; background: var(--navy); transform-origin: left; }
+  .auto .schaduw { fill: url(#schaduw); opacity: 0; }
+  .actief .auto .schaduw { animation: infaden 1.2s 1.6s forwards; }
+  .auto .glans { opacity: 0; }
+  .actief .auto .glans { animation: glans 5s 2.4s ease-in-out infinite; }
+  @keyframes glans { 0% { opacity: 0; transform: translateX(-260px); } 15% { opacity: 1; } 45% { opacity: 1; } 60%, 100% { opacity: 0; transform: translateX(380px); } }
+  @keyframes infaden { to { opacity: 1; } }
+  .tik-hint { margin-top: 4vh; }
 
-  /* Feestbellen bij betaald */
-  .feest { position: fixed; border-radius: 50%; pointer-events: none; z-index: 5;
-    background: radial-gradient(circle at 30% 30%, #fff, var(--aqua) 70%); animation: knal 1.4s cubic-bezier(.1,.8,.3,1) forwards; }
-  @keyframes knal { from { transform: translate(0,0) scale(.3); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; } }
+  /* ---------- Vragen ---------- */
+  .opties { display: grid; gap: 1.8vh; width: min(720px, 92%); margin-top: 5vh; }
+  .optie { display: flex; align-items: center; gap: 24px; text-align: left; background: var(--wit); border: 1.5px solid var(--lijn);
+    border-radius: 24px; padding: 2.6vh 2.6vw; cursor: pointer; position: relative; overflow: hidden;
+    transition: border-color .3s, transform .25s var(--zacht), box-shadow .3s; }
+  .optie:active { transform: scale(.98); }
+  .optie.gekozen { border-color: var(--inkt); box-shadow: 0 18px 40px -22px rgba(22,39,70,.5); }
+  .optie .icoon { width: 64px; height: 64px; flex: none; border-radius: 18px; background: var(--aqua-licht); display: grid; place-items: center; transition: background .3s; }
+  .optie.gekozen .icoon { background: var(--aqua); }
+  .optie .icoon svg { width: 34px; height: 34px; }
+  .optie .titel { font-size: clamp(19px, 2.3vw, 26px); font-weight: 500; }
+  .optie .uitleg { font-size: clamp(14px, 1.6vw, 17px); color: var(--inkt-zacht); font-weight: 300; margin-top: 2px; }
+  .optie .vink { margin-left: auto; width: 34px; height: 34px; flex: none; border-radius: 50%; border: 1.5px solid var(--lijn);
+    display: grid; place-items: center; transition: all .3s var(--zacht); }
+  .optie.gekozen .vink { background: var(--inkt); border-color: var(--inkt); transform: scale(1.1); }
+  .optie .vink svg { width: 16px; height: 16px; opacity: 0; transform: scale(.4); transition: all .3s var(--zacht); }
+  .optie.gekozen .vink svg { opacity: 1; transform: none; }
 
-  .proef { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #ffcf4d; color: #3a2a00;
-    font-size: 13px; font-weight: 800; padding: 5px 16px; border-radius: 999px; display: none; z-index: 10; }
+  /* ---------- Advies ---------- */
+  .advies-naam { font-size: clamp(60px, 10vw, 128px); font-weight: 200; letter-spacing: -4px; line-height: 1; }
+  .advies-prijs { margin-top: 1.4vh; font-size: clamp(26px, 3.4vw, 40px); font-weight: 500; }
+  .advies-prijs small { font-size: .5em; color: var(--inkt-zacht); font-weight: 400; margin-left: 6px; }
+  .waarom { margin-top: 2vh; font-size: clamp(16px, 1.9vw, 20px); color: var(--inkt-zacht); font-weight: 300; max-width: 620px; }
+  .inhoud { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 4vh 0 5vh; max-width: 720px; }
+  .inhoud span { border: 1px solid var(--lijn); border-radius: 999px; padding: 9px 18px; font-size: clamp(14px, 1.6vw, 17px);
+    opacity: 0; transform: translateY(10px) scale(.95); }
+  .actief .inhoud span { animation: op .6s var(--zacht) forwards; }
+  .knoppen { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
-  @media (orientation: portrait) and (max-width: 700px) { .tegels { grid-template-columns: 1fr; } .bon ul { grid-template-columns: 1fr; } }
+  /* ---------- Alle programma's ---------- */
+  .lijst { width: min(760px, 94%); margin-top: 4vh; border-top: 1px solid var(--lijn); }
+  .regel { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 3vh 1vw; border-bottom: 1px solid var(--lijn);
+    cursor: pointer; text-align: left; transition: background .3s, padding .3s var(--zacht); }
+  .regel:active { background: var(--aqua-licht); padding-left: 2vw; }
+  .regel .naam { font-size: clamp(24px, 3vw, 34px); font-weight: 400; }
+  .regel .wat { font-size: clamp(13px, 1.5vw, 16px); color: var(--inkt-zacht); font-weight: 300; margin-top: 2px; }
+  .regel .prijs { font-size: clamp(22px, 2.8vw, 30px); font-weight: 500; white-space: nowrap; }
+  .regel .prijs::after { content: '→'; margin-left: 16px; color: var(--aqua); }
+
+  /* ---------- Betalen ---------- */
+  .ring { width: min(300px, 44vw); height: min(300px, 44vw); position: relative; margin-bottom: 5vh; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .spoor { fill: none; stroke: var(--lijn); stroke-width: 3; }
+  .ring .draai { fill: none; stroke: var(--inkt); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 120 820;
+    animation: rond 2.2s linear infinite; transform-origin: center; }
+  @keyframes rond { to { stroke-dashoffset: -940; } }
+  .ring .midden { position: absolute; inset: 0; display: grid; place-items: center; }
+  .ring .bedrag { font-size: clamp(40px, 6vw, 70px); font-weight: 300; letter-spacing: -2px; }
+  .ring .contactloos { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); width: 34px; }
+  .ring .contactloos path { fill: none; stroke: var(--aqua); stroke-width: 2.5; stroke-linecap: round; opacity: .3; animation: puls 1.6s infinite; }
+  .ring .contactloos path:nth-child(2) { animation-delay: .2s; } .ring .contactloos path:nth-child(3) { animation-delay: .4s; }
+  @keyframes puls { 40% { opacity: 1; } }
+  .omlaag { margin-top: 4vh; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--inkt-zacht); font-size: 15px; }
+  .omlaag i { width: 1.5px; height: 48px; background: linear-gradient(var(--inkt), transparent); animation: valt 1.6s ease-in-out infinite; transform-origin: top; }
+  @keyframes valt { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* ---------- Klaar ---------- */
+  .vinkcirkel { width: min(170px, 30vw); height: min(170px, 30vw); margin-bottom: 4vh; }
+  .vinkcirkel circle { fill: none; stroke-width: 2.5; stroke-dasharray: 330; stroke-dashoffset: 330; }
+  .vinkcirkel path { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+  .actief .vinkcirkel circle { animation: teken .9s var(--zacht) forwards; }
+  .actief .vinkcirkel path { animation: teken .6s .7s var(--zacht) forwards; }
+  .ok circle, .ok path { stroke: var(--groen); }
+  .fout circle, .fout path { stroke: var(--rood); }
+  .stappen { margin-top: 5vh; width: min(640px, 92%); text-align: left; border-top: 1px solid var(--lijn); }
+  .stap { display: flex; gap: 22px; align-items: center; padding: 2.4vh 0; border-bottom: 1px solid var(--lijn);
+    font-size: clamp(16px, 1.9vw, 20px); font-weight: 300; opacity: 0; transform: translateX(-16px); }
+  .actief .stap { animation: op .7s var(--zacht) forwards; }
+  .stap b { font-weight: 500; color: var(--aqua); font-size: 14px; letter-spacing: 2px; min-width: 28px; }
+  .grijs { margin-top: 3vh; color: var(--inkt-zacht); font-size: 14px; letter-spacing: 1px; }
+  .tijdlijn { width: min(240px, 50vw); height: 2px; background: var(--lijn); margin: 2vh auto 0; overflow: hidden; border-radius: 2px; }
+  .tijdlijn div { height: 100%; background: var(--inkt); transform-origin: left; }
+
+  .proef { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #fff4d1; color: #6b4e00;
+    font-size: 12px; font-weight: 600; letter-spacing: 1px; padding: 6px 16px; border-radius: 999px; display: none; z-index: 10; }
 </style>
 </head>
 <body>
-
-<div id="bellen"></div>
-<div class="golven">
-  <svg class="golf1" viewBox="0 0 2400 200" preserveAspectRatio="none"><path fill="#a6bada" d="M0 90 Q150 30 300 90 T600 90 T900 90 T1200 90 T1500 90 T1800 90 T2100 90 T2400 90 V200 H0z"/></svg>
-  <svg class="golf2" viewBox="0 0 2400 200" preserveAspectRatio="none"><path fill="#24406f" d="M0 120 Q200 70 400 120 T800 120 T1200 120 T1600 120 T2000 120 T2400 120 V200 H0z"/></svg>
-  <svg class="golf3" viewBox="0 0 2400 200" preserveAspectRatio="none"><path fill="#162746" d="M0 150 Q100 120 200 150 T400 150 T600 150 T800 150 T1000 150 T1200 150 T1400 150 T1600 150 T1800 150 T2000 150 T2200 150 T2400 150 V200 H0z"/></svg>
+<div class="licht"></div><div class="licht twee"></div>
+<div class="voortgang" id="voortgang"></div>
+<div class="kop">
+  <div class="merk">Carwash <span>Barneveld</span></div>
+  <button class="stop" id="stop">Opnieuw beginnen</button>
 </div>
 
-<!-- 1. Welkom -->
-<section class="scherm actief" id="welkom">
-  <svg class="wasstraat" viewBox="0 0 560 260" aria-hidden="true">
-    <!-- poort -->
-    <rect x="150" y="20" width="260" height="22" rx="10" fill="#162746"/>
-    <rect x="150" y="20" width="22" height="210" rx="8" fill="#162746"/>
-    <rect x="388" y="20" width="22" height="210" rx="8" fill="#162746"/>
-    <g fill="#a6bada">
-      <circle class="drup" cx="215" cy="50" r="5" style="animation-delay:0s"/>
-      <circle class="drup" cx="255" cy="50" r="4" style="animation-delay:.35s"/>
-      <circle class="drup" cx="300" cy="50" r="5" style="animation-delay:.7s"/>
-      <circle class="drup" cx="345" cy="50" r="4" style="animation-delay:.2s"/>
-    </g>
-    <!-- borstels -->
-    <g class="borstel links"><circle cx="195" cy="150" r="34" fill="none" stroke="#a6bada" stroke-width="16" stroke-dasharray="6 6"/></g>
-    <g class="borstel"><circle cx="365" cy="150" r="34" fill="none" stroke="#a6bada" stroke-width="16" stroke-dasharray="6 6"/></g>
-    <!-- auto -->
-    <g class="auto">
-      <path d="M200 205 L212 170 Q220 152 240 150 L320 150 Q340 152 352 168 L372 185 Q392 188 394 205 L394 215 L190 215 Z" fill="#24406f"/>
-      <path d="M232 172 Q238 160 250 160 L285 160 L285 180 L228 180 Z" fill="#cfdcee"/>
-      <path d="M292 160 L322 160 Q332 162 340 172 L346 180 L292 180 Z" fill="#cfdcee"/>
-      <g class="wielen" fill="#162746">
-        <circle cx="240" cy="217" r="18" stroke="#a6bada" stroke-width="5" stroke-dasharray="8 6"/>
-        <circle cx="350" cy="217" r="18" stroke="#a6bada" stroke-width="5" stroke-dasharray="8 6"/>
-      </g>
-    </g>
-    <rect x="40" y="236" width="480" height="6" rx="3" fill="#162746" opacity=".25"/>
-  </svg>
-  <h1 class="titel" id="titel">Carwash Barneveld</h1>
-  <div class="slogan">Stralend de weg op!</div>
-  <div class="start"><span class="hand">👆</span> Tik om te beginnen</div>
+<!-- Welkom -->
+<section class="scherm actief" id="welkom" data-stap="0">
+  <div class="foto"></div>
+  <div class="zon"></div>
+  <div id="druppels"></div>
+  <div class="donker"></div>
+  <div class="logo-wit">Carwash <span>Barneveld</span></div>
+  <div class="slogan">Stralend de weg op</div>
+  <div class="tekst">
+  <div class="klein-kop op d3" id="groet">Goedemiddag</div>
+  <h1 class="op d4">Klaar om te <b>stralen?</b></h1>
+  <div class="zin op d5">Twee korte vragen en wij weten welke wasbeurt bij je past.</div>
+  <div class="tik-hint op d6"><button class="knop vol">Begin <span class="pijl">→</span></button></div>
+  </div>
 </section>
 
-<!-- 2. Kies -->
-<section class="scherm" id="kies">
-  <div class="bovenbalk">
-    <div class="merk"><div class="stip"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2s-7 8-7 13a7 7 0 0014 0c0-5-7-13-7-13z" fill="#a6bada"/></svg></div>Carwash <span>Barneveld</span></div>
-    <button class="knop licht klein" data-naar="welkom">Stoppen</button>
+<!-- Vraag 1 -->
+<section class="scherm" id="vraag1" data-stap="1">
+  <div class="klein-kop op d1">Vraag 1 van 2</div>
+  <h1 class="op d2">Hoe vies is <b>je auto?</b></h1>
+  <div class="opties" data-vraag="vuil">
+    <div class="optie op d3" data-waarde="1">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round"><path d="M4 16c2-1 4-1 6 0s4 1 6 0 3-1 4-.5"/><circle cx="8" cy="9" r="1"/><circle cx="14" cy="7" r="1"/></svg></div>
+      <div><div class="titel">Een beetje stoffig</div><div class="uitleg">Even opfrissen</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="optie op d4" data-waarde="2">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round"><path d="M12 3s-5 6-5 10a5 5 0 0010 0c0-4-5-10-5-10z"/></svg></div>
+      <div><div class="titel">Flink vies</div><div class="uitleg">Vuile velgen, regen en straatvuil</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="optie op d5" data-waarde="3">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round"><ellipse cx="12" cy="13" rx="3" ry="4.5"/><path d="M12 8.5V6M9 10L5 7M15 10l4-3M9 14l-4 2M15 14l4 2"/></svg></div>
+      <div><div class="titel">Heel vies</div><div class="uitleg">Modder, insecten of lang niet gewassen</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
   </div>
-  <div class="voortgang" data-stap="1"></div>
-  <h1>Welke wasbeurt<br>wil je vandaag?</h1>
-  <div class="tegels" id="tegels"></div>
+  <button class="linkje op d6" data-alles>Ik weet al wat ik wil</button>
 </section>
 
-<!-- 3. Controleren -->
-<section class="scherm" id="bevestig">
-  <div class="bovenbalk">
-    <div class="merk"><div class="stip"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2s-7 8-7 13a7 7 0 0014 0c0-5-7-13-7-13z" fill="#a6bada"/></svg></div>Carwash <span>Barneveld</span></div>
-  </div>
-  <div class="voortgang" data-stap="2"></div>
-  <div class="controle">
-    <div style="display:flex;flex-direction:column;align-items:center;width:100%">
-      <h1 style="text-align:center;margin-bottom:3vh">Klopt dit?</h1>
-      <div class="bon">
-        <div class="kop"><div class="naam" id="bev-naam"></div><div class="prijs" id="bev-prijs"></div></div>
-        <ul id="bev-lijst"></ul>
-      </div>
-      <div class="knoppenrij">
-        <button class="knop licht" data-naar="kies">Terug</button>
-        <button class="knop donker" id="afrekenknop">Afrekenen</button>
-      </div>
+<!-- Vraag 2 -->
+<section class="scherm" id="vraag2" data-stap="2">
+  <div class="klein-kop op d1">Vraag 2 van 2</div>
+  <h1 class="op d2">Hoe wil je <b>wegrijden?</b></h1>
+  <div class="opties" data-vraag="extra">
+    <div class="optie op d3" data-waarde="1">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <div><div class="titel">Gewoon schoon</div><div class="uitleg">Snel en voordelig</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="optie op d4" data-waarde="2">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></svg></div>
+      <div><div class="titel">Met een mooie glans</div><div class="uitleg">Zichtbaar glimmend</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="optie op d5" data-waarde="3">
+      <div class="icoon"><svg viewBox="0 0 24 24" fill="none" stroke="#162746" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg></div>
+      <div><div class="titel">Glans en bescherming</div><div class="uitleg">Met Wax Polish, alles erop en eraan</div></div>
+      <div class="vink"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
   </div>
 </section>
 
-<!-- 4. Betalen -->
-<section class="scherm" id="betalen">
-  <svg class="pinbeeld" viewBox="0 0 300 230" aria-hidden="true">
-    <rect x="80" y="70" width="140" height="150" rx="22" fill="#162746"/>
-    <rect x="98" y="88" width="104" height="70" rx="10" fill="#cfdcee"/>
-    <g fill="#24406f"><circle cx="120" cy="182" r="9"/><circle cx="150" cy="182" r="9"/><circle cx="180" cy="182" r="9"/></g>
-    <path class="golfje" d="M135 40 q15 -14 30 0"/>
-    <path class="golfje" d="M125 28 q25 -24 50 0"/>
-    <path class="golfje" d="M115 16 q35 -34 70 0"/>
-    <g class="pasje"><rect x="170" y="30" width="96" height="62" rx="10" fill="#a6bada" stroke="#fff" stroke-width="4"/><rect x="184" y="46" width="20" height="15" rx="3" fill="#fff"/></g>
-  </svg>
-  <h1 id="betaal-titel">Betaal op het pinapparaat</h1>
-  <div class="bedrag" id="betaal-bedrag"></div>
-  <div class="onder" id="betaal-tekst">Houd je pas of telefoon tegen het pinapparaat</div>
-  <div class="wachtbalk"><div></div></div>
-  <div class="pijl" id="pijl"><svg viewBox="0 0 24 24"><path d="M12 4v15M5 13l7 7 7-7" stroke="#162746" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Het pinapparaat staat hieronder</div>
-  <button class="knop licht klein" id="annuleer" style="margin-top:3vh">Annuleren</button>
-</section>
-
-<!-- 5a. Gelukt -->
-<section class="scherm uitslag" id="gelukt">
-  <svg class="groot-icoon" viewBox="0 0 120 120">
-    <circle class="vulling" cx="60" cy="60" r="52" fill="#23a26d"/>
-    <circle class="cirkel" cx="60" cy="60" r="54" fill="none" stroke="#23a26d" stroke-width="6"/>
-    <path class="teken" d="M36 62 l16 16 l32 -34" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <h1>Betaald, bedankt!</h1>
-  <div class="onder" id="gelukt-prog"></div>
-  <div class="stappen" id="gelukt-stappen"></div>
-  <div class="klein-grijs" id="bonnr"></div>
-  <div class="aftel"><div id="aftel-ok"></div></div>
-</section>
-
-<!-- 5b. Mislukt -->
-<section class="scherm uitslag" id="mislukt">
-  <svg class="groot-icoon schud" viewBox="0 0 120 120">
-    <circle class="vulling" cx="60" cy="60" r="52" fill="#d64545"/>
-    <circle class="cirkel" cx="60" cy="60" r="54" fill="none" stroke="#d64545" stroke-width="6"/>
-    <path class="teken" d="M42 42 L78 78 M78 42 L42 78" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
-  </svg>
-  <h1>Betaling niet gelukt</h1>
-  <div class="onder" id="mislukt-tekst">Er is niets afgeschreven. Probeer het nog een keer.</div>
-  <div class="knoppenrij">
-    <button class="knop licht" data-naar="welkom">Stoppen</button>
-    <button class="knop donker" id="opnieuw">Opnieuw proberen</button>
+<!-- Advies -->
+<section class="scherm" id="advies" data-stap="3">
+  <div class="klein-kop op d1">Ons advies voor jou</div>
+  <div class="advies-naam op d2" id="adv-naam"></div>
+  <div class="advies-prijs op d3" id="adv-prijs"></div>
+  <div class="waarom op d4" id="adv-waarom"></div>
+  <div class="inhoud" id="adv-inhoud"></div>
+  <div class="knoppen op d6">
+    <button class="knop vol" id="afrekenknop">Afrekenen <span class="pijl">→</span></button>
   </div>
-  <div class="aftel"><div id="aftel-fout"></div></div>
+  <button class="linkje op d6" data-alles>Liever een ander programma</button>
 </section>
 
-<div class="proef" id="proef">PROEFSTAND: er wordt niet echt betaald</div>
+<!-- Alle programma's -->
+<section class="scherm" id="alles" data-stap="3">
+  <div class="klein-kop op d1">Alle programma's</div>
+  <h1 class="op d2">Kies je <b>wasbeurt</b></h1>
+  <div class="lijst" id="lijst"></div>
+</section>
+
+<!-- Betalen -->
+<section class="scherm" id="betalen" data-stap="4">
+  <div class="ring op d1">
+    <svg viewBox="0 0 320 320"><circle class="spoor" cx="160" cy="160" r="150"/><circle class="draai" cx="160" cy="160" r="150"/></svg>
+    <div class="midden"><div class="bedrag" id="betaal-bedrag"></div></div>
+    <svg class="contactloos" viewBox="0 0 34 30"><path d="M10 9 q4 6 0 12"/><path d="M16 5 q7 10 0 20"/><path d="M22 1 q10 14 0 28"/></svg>
+  </div>
+  <h1 class="op d2" id="betaal-titel" style="font-size:clamp(30px,4.4vw,54px)">Betaal op het <b>pinapparaat</b></h1>
+  <div class="zin op d3" id="betaal-tekst">Houd je pas of telefoon tegen het pinapparaat</div>
+  <div class="omlaag op d4" id="omlaag"><i></i>Het pinapparaat staat hieronder</div>
+  <button class="linkje op d5" id="annuleer">Annuleren</button>
+</section>
+
+<!-- Gelukt -->
+<section class="scherm" id="gelukt" data-stap="5">
+  <svg class="vinkcirkel ok" viewBox="0 0 110 110"><circle cx="55" cy="55" r="52"/><path d="M33 57 l15 15 l30 -32"/></svg>
+  <div class="klein-kop op d3" id="gelukt-prog"></div>
+  <h1 class="op d4">Betaald. <b>Fijne rit.</b></h1>
+  <div class="stappen" id="gelukt-stappen"></div>
+  <div class="grijs" id="bonnr"></div>
+  <div class="tijdlijn"><div id="tijd-ok"></div></div>
+</section>
+
+<!-- Mislukt -->
+<section class="scherm" id="mislukt" data-stap="4">
+  <svg class="vinkcirkel fout" viewBox="0 0 110 110"><circle cx="55" cy="55" r="52"/><path d="M38 38 L72 72 M72 38 L38 72"/></svg>
+  <h1 class="op d3">Niet <b>gelukt</b></h1>
+  <div class="zin op d4" id="mislukt-tekst">Er is niets afgeschreven. Probeer het nog een keer.</div>
+  <div class="knoppen op d5" style="margin-top:5vh">
+    <button class="knop rand" data-naar="welkom">Stoppen</button>
+    <button class="knop vol" id="opnieuw">Opnieuw proberen</button>
+  </div>
+  <div class="tijdlijn" style="margin-top:4vh"><div id="tijd-fout"></div></div>
+</section>
+
+<div class="proef" id="proef">PROEFSTAND · ER WORDT NIET ECHT BETAALD</div>
 
 <script>
 /* ================= INSTELLINGEN ================= */
-// Prijzen in centen. Staan OOK in server/worker.js: pas ze op beide plekken aan.
-const PROGRAMMAS = [
-  { id: 'basis',     naam: 'Basis',     prijs: 700,  niveau: 1, kort: 'Snel en schoon',
+// Prijzen in centen. Staan OOK in worker.js: pas ze op beide plekken aan.
+const PROGRAMMAS = {
+  basis:     { naam: 'Basis',     prijs: 700,  kort: '2x wassen en drogen',
     inhoud: ['2x wassen', 'Drogen'] },
-  { id: 'normaal',   naam: 'Normaal',   prijs: 895,  niveau: 2, kort: 'Met velgen en HD reiniger',
+  normaal:   { naam: 'Normaal',   prijs: 895,  kort: 'Met HD reiniger en velgen',
     inhoud: ['HD reiniger', 'Velgenreiniging', '2x wassen', 'GlansWas of onderkant', 'Drogen'] },
-  { id: 'intensief', naam: 'Intensief', prijs: 1100, niveau: 3, kort: 'Met insecten en actief schuim', sticker: 'ZOMERTIP',
+  intensief: { naam: 'Intensief', prijs: 1100, kort: 'Met insecten, actief schuim en GlansWas',
     inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'GlansWas', 'Onderkant wassen', 'Drogen'] },
-  { id: 'premium',   naam: 'Premium',   prijs: 1395, niveau: 4, kort: 'Alles erop en eraan, met Wax Polish', sticker: 'COMPLEET', donker: true,
+  premium:   { naam: 'Premium',   prijs: 1395, kort: 'Alles erop en eraan, met Wax Polish',
     inhoud: ['HD reiniger', 'Velgenreiniging', 'Insectverwijderaar', 'Actief schuim', '2x wassen', 'Onderkant wassen', 'Wax Polish', 'Drogen'] },
-];
+};
+
+// Welk programma raden we aan? vuil: 1 stoffig, 2 flink vies, 3 heel vies. extra: 1 schoon, 2 glans, 3 bescherming.
+function advies(vuil, extra) {
+  if (extra === 3) return { id: 'premium', waarom: 'Je wilt glans én bescherming. Met Wax Polish blijft je auto langer mooi.' };
+  if (vuil === 3) return { id: 'intensief', waarom: 'Bij modder en insecten heb je het actieve schuim en de insectverwijderaar nodig.' };
+  if (extra === 2) return { id: vuil === 1 ? 'normaal' : 'intensief', waarom: vuil === 1 ? 'Een frisse wasbeurt met een mooie GlansWas.' : 'Grondig schoon en daarna een mooie glans met GlansWas.' };
+  if (vuil === 2) return { id: 'normaal', waarom: 'De HD reiniger en velgenreiniging halen het straatvuil er goed af.' };
+  return { id: 'basis', waarom: 'Voor een stoffige auto is dit snel en voordelig.' };
+}
 
 const STAPPEN_NA_BETALEN = [
   'Rij je auto naar de ingang van de wasstraat',
   'Laat je bonnummer zien als dat gevraagd wordt',
-  'Spiegels inklappen, antenne eraf en genieten!',
+  'Spiegels inklappen, antenne eraf en genieten',
 ];
 
 const TERUG_NAAR_START_NA = 60;
@@ -368,8 +352,7 @@ const MAX_WACHTEN_BETALING = 150;
   try {
     if (p.get('api')) localStorage.setItem('kassa_api', p.get('api').replace(/\/$/, ''));
     if (p.get('sleutel')) localStorage.setItem('kassa_sleutel', p.get('sleutel'));
-    // De link laten staan: een icoon op het beginscherm van de iPad bewaart
-    // dan de instellingen in zijn eigen link.
+    // De link laten staan: een icoon op het beginscherm bewaart dan de instellingen in zijn eigen link.
   } catch (e) {}
 })();
 function lees(k) {
@@ -383,131 +366,79 @@ const SLEUTEL = lees('kassa_sleutel');
 const PROEF = !API;
 if (PROEF) document.getElementById('proef').style.display = 'block';
 
-/* ================= ANIMATIES ================= */
-// Opstijgende zeepbellen
-const bellen = document.getElementById('bellen');
-function maakBel() {
-  const b = document.createElement('div');
-  const maat = 14 + Math.random() * 46;
-  b.className = 'bel';
-  b.style.width = b.style.height = maat + 'px';
-  b.style.left = Math.random() * 100 + 'vw';
-  b.style.setProperty('--zwaai', (Math.random() * 80 - 40) + 'px');
-  b.style.animationDuration = (9 + Math.random() * 9) + 's';
-  bellen.appendChild(b);
-  b.addEventListener('animationend', () => b.remove());
-}
-for (let i = 0; i < 8; i++) setTimeout(maakBel, i * 500);
-setInterval(maakBel, 1300);
-
-// Titel letter voor letter
-const titel = document.getElementById('titel');
-titel.innerHTML = [...titel.textContent].map((l, i) =>
-  `<span style="animation-delay:${i * 0.045}s">${l === ' ' ? '&nbsp;' : l}</span>`).join('');
-
-// Rimpel bij elke tik op een knop of tegel
-document.addEventListener('pointerdown', e => {
-  const doel = e.target.closest('.knop, .tegel');
-  if (!doel) return;
-  const r = doel.getBoundingClientRect();
-  const s = document.createElement('span');
-  const maat = Math.max(r.width, r.height) / 2;
-  s.className = 'rimpel';
-  s.style.width = s.style.height = maat + 'px';
-  s.style.left = (e.clientX - r.left - maat / 2) + 'px';
-  s.style.top = (e.clientY - r.top - maat / 2) + 'px';
-  doel.appendChild(s);
-  setTimeout(() => s.remove(), 650);
-});
-
-// Feestbellen bij betaald
-function feest() {
-  for (let i = 0; i < 40; i++) {
-    const f = document.createElement('div');
-    const maat = 10 + Math.random() * 30;
-    const hoek = Math.random() * Math.PI * 2;
-    const afstand = 200 + Math.random() * 420;
-    f.className = 'feest';
-    f.style.width = f.style.height = maat + 'px';
-    f.style.left = (innerWidth / 2 - maat / 2) + 'px';
-    f.style.top = (innerHeight * 0.3) + 'px';
-    f.style.setProperty('--dx', Math.cos(hoek) * afstand + 'px');
-    f.style.setProperty('--dy', Math.sin(hoek) * afstand + 'px');
-    f.style.animationDelay = (0.5 + Math.random() * 0.3) + 's';
-    document.body.appendChild(f);
-    setTimeout(() => f.remove(), 2400);
-  }
-}
-
-// Voortgangsbalk
-const STAPNAMEN = ['Kiezen', 'Controleren', 'Betalen'];
-document.querySelectorAll('.voortgang').forEach(v => {
-  const nu = +v.dataset.stap;
-  v.innerHTML = STAPNAMEN.map((n, i) => {
-    const nr = i + 1;
-    const cls = nr < nu ? 'klaar' : nr === nu ? 'nu' : '';
-    const lijn = i < STAPNAMEN.length - 1 ? `<div class="vlijn ${nr < nu ? 'vol' : ''}"></div>` : '';
-    return `<div class="vstap ${cls}"><i>${nr < nu ? '✓' : nr}</i>${n}</div>${lijn}`;
-  }).join('');
-});
-
-/* ================= LOGICA ================= */
-let gekozen = null, transactieId = null;
+/* ================= SCHERMEN ================= */
+let gekozen = null, antwoorden = {}, transactieId = null;
 let pollTimer = null, rustTimer = null, aftelTimer = null, betaalStart = 0;
+const euro = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
 
-const euro = c => (c / 100).toFixed(2).replace('.', ',');
+function groet() {
+  const u = new Date().getHours();
+  document.getElementById('groet').textContent = u < 12 ? 'Goedemorgen' : u < 18 ? 'Goedemiddag' : 'Goedenavond';
+}
 
 function naar(id) {
-  const oud = document.querySelector('.scherm.actief');
-  if (oud && oud.id !== id) {
-    oud.classList.add('weg');
-    oud.classList.remove('actief');
-    setTimeout(() => oud.classList.remove('weg'), 600);
-  }
+  document.querySelectorAll('.scherm.actief').forEach(s => s.classList.remove('actief'));
   const nieuw = document.getElementById(id);
-  // animaties opnieuw laten starten
-  nieuw.classList.remove('actief'); void nieuw.offsetWidth; nieuw.classList.add('actief');
+  void nieuw.offsetWidth;
+  nieuw.classList.add('actief');
+  const stap = +nieuw.dataset.stap;
+  document.getElementById('voortgang').style.width = (stap / 5 * 100) + '%';
+  document.getElementById('stop').classList.toggle('zichtbaar', stap >= 1 && stap <= 3);
   clearTimeout(aftelTimer);
-  if (id === 'welkom') gekozen = null;
+  document.body.classList.toggle('op-welkom', id === 'welkom');
+  if (id === 'welkom') { gekozen = null; antwoorden = {}; groet(); wisKeuzes(); }
   resetRust();
 }
-document.querySelectorAll('[data-naar]').forEach(k => k.addEventListener('click', e => { e.stopPropagation(); naar(k.dataset.naar); }));
+
+function wisKeuzes() { document.querySelectorAll('.optie.gekozen').forEach(o => o.classList.remove('gekozen')); }
 
 function resetRust() {
   clearTimeout(rustTimer);
-  const huidig = document.querySelector('.scherm.actief').id;
-  if (['kies', 'bevestig'].includes(huidig)) rustTimer = setTimeout(() => naar('welkom'), TERUG_NAAR_START_NA * 1000);
+  const s = document.querySelector('.scherm.actief');
+  if (s && ['vraag1', 'vraag2', 'advies', 'alles'].includes(s.id)) rustTimer = setTimeout(() => naar('welkom'), TERUG_NAAR_START_NA * 1000);
 }
 document.addEventListener('pointerdown', resetRust, { passive: true });
-document.getElementById('welkom').addEventListener('click', () => naar('kies'));
 
-function tekenTegels() {
-  const t = document.getElementById('tegels');
-  t.innerHTML = '';
-  PROGRAMMAS.forEach((p, i) => {
-    const d = document.createElement('div');
-    d.className = 'tegel' + (p.donker ? ' donker' : '');
-    d.style.animationDelay = (0.08 + i * 0.1) + 's';
-    d.innerHTML = `<div class="glans"></div>` +
-      (p.sticker ? `<div class="sticker">${p.sticker}</div>` : '') +
-      `<div class="niveau">${[1,2,3,4].map(n => `<b class="${n <= p.niveau ? 'aan' : ''}" style="animation-delay:${n*0.2}s"></b>`).join('')}</div>` +
-      `<div class="naam">${p.naam}</div><div class="kort">${p.kort}</div>` +
-      `<div class="prijs"><small>€</small>${euro(p.prijs)}</div>`;
-    d.addEventListener('click', () => setTimeout(() => kies(p), 160));
-    t.appendChild(d);
-  });
+document.getElementById('welkom').addEventListener('click', () => naar('vraag1'));
+document.getElementById('stop').addEventListener('click', () => naar('welkom'));
+document.querySelectorAll('[data-naar]').forEach(k => k.addEventListener('click', () => naar(k.dataset.naar)));
+document.querySelectorAll('[data-alles]').forEach(k => k.addEventListener('click', () => naar('alles')));
+
+// Vragen beantwoorden
+document.querySelectorAll('.opties').forEach(groep => {
+  groep.querySelectorAll('.optie').forEach(o => o.addEventListener('click', () => {
+    groep.querySelectorAll('.optie').forEach(x => x.classList.remove('gekozen'));
+    o.classList.add('gekozen');
+    antwoorden[groep.dataset.vraag] = +o.dataset.waarde;
+    setTimeout(() => {
+      if (groep.dataset.vraag === 'vuil') naar('vraag2');
+      else toonAdvies();
+    }, 450);
+  }));
+});
+
+function toonAdvies() {
+  const a = advies(antwoorden.vuil || 1, antwoorden.extra || 1);
+  kies(a.id, a.waarom);
 }
 
-const VINK = '<span class="v"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#162746" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-function kies(p) {
-  gekozen = p;
-  document.getElementById('bev-naam').textContent = p.naam;
-  document.getElementById('bev-prijs').textContent = '€ ' + euro(p.prijs);
-  document.getElementById('bev-lijst').innerHTML = p.inhoud.map((x, i) =>
-    `<li style="animation-delay:${0.35 + i * 0.08}s">${VINK.replace('class="v"', `class="v" style="animation-delay:${0.35 + i * 0.08}s"`)}${x}</li>`).join('');
-  naar('bevestig');
+function kies(id, waarom) {
+  gekozen = Object.assign({ id }, PROGRAMMAS[id]);
+  document.getElementById('adv-naam').textContent = gekozen.naam;
+  document.getElementById('adv-prijs').innerHTML = euro(gekozen.prijs) + '<small>incl. btw</small>';
+  document.getElementById('adv-waarom').textContent = waarom || gekozen.kort;
+  document.getElementById('adv-inhoud').innerHTML = gekozen.inhoud.map((x, i) =>
+    `<span style="animation-delay:${0.55 + i * 0.06}s">${x}</span>`).join('');
+  document.querySelector('#advies .klein-kop').textContent = waarom ? 'Ons advies voor jou' : 'Jouw keuze';
+  naar('advies');
 }
 
+// Lijst met alle programma's
+document.getElementById('lijst').innerHTML = Object.entries(PROGRAMMAS).map(([id, p], i) =>
+  `<div class="regel op d${i + 3}" data-id="${id}"><div><div class="naam">${p.naam}</div><div class="wat">${p.kort}</div></div><div class="prijs">${euro(p.prijs)}</div></div>`).join('');
+document.querySelectorAll('.regel').forEach(r => r.addEventListener('click', () => kies(r.dataset.id)));
+
+/* ================= BETALEN ================= */
 async function api(pad, body) {
   const r = await fetch(API + pad, {
     method: body ? 'POST' : 'GET',
@@ -519,37 +450,39 @@ async function api(pad, body) {
   return data;
 }
 
-// Bedrag telt op van 0 naar de prijs
 function telOp(el, doel) {
-  const start = performance.now(), duur = 900;
+  const start = performance.now(), duur = 1100;
   (function stap(t) {
-    const f = Math.min(1, (t - start) / duur);
-    const e = 1 - Math.pow(1 - f, 3);
-    el.textContent = '€ ' + euro(Math.round(doel * e));
+    const f = Math.min(1, (t - start) / duur), e = 1 - Math.pow(1 - f, 4);
+    el.textContent = euro(Math.round(doel * e));
     if (f < 1) requestAnimationFrame(stap);
   })(start);
 }
 
+function zetBetaalTekst(titel, tekst, klaar) {
+  document.getElementById('betaal-titel').innerHTML = titel;
+  document.getElementById('betaal-tekst').textContent = tekst;
+  document.getElementById('omlaag').style.visibility = klaar ? 'visible' : 'hidden';
+  document.getElementById('annuleer').disabled = !klaar;
+}
+
 async function startBetaling() {
-  if (!gekozen) return naar('kies');
+  if (!gekozen) return naar('vraag1');
   naar('betalen');
   telOp(document.getElementById('betaal-bedrag'), gekozen.prijs);
-  document.getElementById('betaal-titel').textContent = 'Even geduld...';
-  document.getElementById('betaal-tekst').textContent = 'Het pinapparaat wordt klaargezet';
-  document.getElementById('pijl').style.visibility = 'hidden';
-  document.getElementById('annuleer').disabled = true;
+  zetBetaalTekst('Een <b>moment</b>', 'Het pinapparaat wordt klaargezet', false);
   betaalStart = Date.now();
 
   if (PROEF) {
     transactieId = 'proef-' + Date.now();
-    setTimeout(klaarOmTePinnen, 1200);
+    setTimeout(() => zetBetaalTekst('Betaal op het <b>pinapparaat</b>', 'Houd je pas of telefoon tegen het pinapparaat', true), 1200);
     setTimeout(() => uitslag('successful'), 6000);
     return;
   }
   try {
     const res = await api('/api/afrekenen', { programma: gekozen.id });
     transactieId = res.id;
-    klaarOmTePinnen();
+    zetBetaalTekst('Betaal op het <b>pinapparaat</b>', 'Houd je pas of telefoon tegen het pinapparaat', true);
     pollTimer = setInterval(controleer, 1500);
   } catch (e) {
     console.log('afrekenen mislukt', e);
@@ -558,13 +491,6 @@ async function startBetaling() {
 }
 document.getElementById('afrekenknop').addEventListener('click', startBetaling);
 document.getElementById('opnieuw').addEventListener('click', startBetaling);
-
-function klaarOmTePinnen() {
-  document.getElementById('betaal-titel').textContent = 'Betaal op het pinapparaat';
-  document.getElementById('betaal-tekst').textContent = 'Houd je pas of telefoon tegen het pinapparaat';
-  document.getElementById('pijl').style.visibility = 'visible';
-  document.getElementById('annuleer').disabled = false;
-}
 
 async function controleer() {
   if (Date.now() - betaalStart > MAX_WACHTEN_BETALING * 1000) return annuleer(true);
@@ -576,8 +502,7 @@ async function controleer() {
 
 async function annuleer(teLang) {
   clearInterval(pollTimer);
-  document.getElementById('annuleer').disabled = true;
-  document.getElementById('betaal-titel').textContent = 'Bezig met annuleren...';
+  zetBetaalTekst('Bezig met <b>annuleren</b>', 'Een moment alsjeblieft', false);
   if (!PROEF) { try { await api('/api/annuleren', {}); } catch (e) {} }
   setTimeout(async () => {
     if (!PROEF) {
@@ -594,32 +519,46 @@ document.getElementById('annuleer').addEventListener('click', () => annuleer(fal
 function uitslag(status, tekst) {
   clearInterval(pollTimer);
   if (status === 'successful') {
-    document.getElementById('gelukt-prog').textContent = gekozen.naam + ' · € ' + euro(gekozen.prijs);
+    document.getElementById('gelukt-prog').textContent = gekozen.naam + ' · ' + euro(gekozen.prijs);
     document.getElementById('gelukt-stappen').innerHTML = STAPPEN_NA_BETALEN.map((s, i) =>
-      `<div class="stap" style="animation-delay:${1.1 + i * 0.15}s"><b>${i + 1}</b>${s}</div>`).join('');
-    document.getElementById('bonnr').textContent = 'Bonnummer ' + String(transactieId).slice(-6).toUpperCase();
+      `<div class="stap" style="animation-delay:${1.1 + i * 0.15}s"><b>0${i + 1}</b>${s}</div>`).join('');
+    document.getElementById('bonnr').textContent = 'BONNUMMER ' + String(transactieId).slice(-6).toUpperCase();
     naar('gelukt');
-    feest();
-    aftellen('aftel-ok');
+    aftellen('tijd-ok');
   } else {
     document.getElementById('mislukt-tekst').textContent = tekst || 'Er is niets afgeschreven. Probeer het nog een keer.';
     naar('mislukt');
-    aftellen('aftel-fout');
+    aftellen('tijd-fout');
   }
 }
 
 function aftellen(id) {
   const balk = document.getElementById(id);
-  balk.style.transition = 'none';
-  balk.style.transform = 'scaleX(1)';
+  balk.style.transition = 'none'; balk.style.transform = 'scaleX(1)';
   void balk.offsetWidth;
-  balk.style.transition = `transform ${UITSLAG_ZICHTBAAR}s linear`;
-  balk.style.transform = 'scaleX(0)';
+  balk.style.transition = `transform ${UITSLAG_ZICHTBAAR}s linear`; balk.style.transform = 'scaleX(0)';
   clearTimeout(aftelTimer);
   aftelTimer = setTimeout(() => naar('welkom'), UITSLAG_ZICHTBAAR * 1000);
 }
 
-tekenTegels();
+// Zwevende lichtdruppels over de foto
+const druppels = document.getElementById('druppels');
+function maakDruppel() {
+  if (!document.getElementById('welkom').classList.contains('actief')) return;
+  const d = document.createElement('div');
+  const m = 4 + Math.random() * 14;
+  d.className = 'druppel';
+  d.style.width = d.style.height = m + 'px';
+  d.style.left = (10 + Math.random() * 80) + '%';
+  d.style.top = (15 + Math.random() * 60) + '%';
+  d.style.animationDuration = (4 + Math.random() * 5) + 's';
+  druppels.appendChild(d);
+  d.addEventListener('animationend', () => d.remove());
+}
+setInterval(maakDruppel, 350);
+
+document.body.classList.add('op-welkom');
+groet();
 </script>
 </body>
 </html>
