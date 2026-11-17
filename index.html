@@ -368,10 +368,16 @@ const MAX_WACHTEN_BETALING = 150;
   try {
     if (p.get('api')) localStorage.setItem('kassa_api', p.get('api').replace(/\/$/, ''));
     if (p.get('sleutel')) localStorage.setItem('kassa_sleutel', p.get('sleutel'));
-    if (p.get('api') || p.get('sleutel')) history.replaceState(null, '', location.pathname);
+    // De link laten staan: een icoon op het beginscherm van de iPad bewaart
+    // dan de instellingen in zijn eigen link.
   } catch (e) {}
 })();
-function lees(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+function lees(k) {
+  const p = new URLSearchParams(location.search);
+  const uitLink = k === 'kassa_api' ? p.get('api') : p.get('sleutel');
+  if (uitLink) return uitLink.replace(/\/$/, '');
+  try { return localStorage.getItem(k) || ''; } catch (e) { return ''; }
+}
 const API = lees('kassa_api');
 const SLEUTEL = lees('kassa_sleutel');
 const PROEF = !API;
