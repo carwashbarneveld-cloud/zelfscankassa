@@ -1,0 +1,25 @@
+name = "zelfscankassa"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Het adres van de kassapagina, bijvoorbeeld https://jouwnaam.github.io
+TOEGESTANE_SITE = "*"
+
+[[durable_objects.bindings]]
+name = "STATUS"
+class_name = "Statusopslag"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Statusopslag"]
+
+# Geheimen zet je NIET in dit bestand, maar met:
+#   npx wrangler secret put SUMUP_API_KEY
+#   npx wrangler secret put SUMUP_MERCHANT_CODE
+#   npx wrangler secret put SUMUP_AFFILIATE_KEY
+#   npx wrangler secret put SUMUP_APP_ID
+#   npx wrangler secret put SUMUP_READER_ID
+#   npx wrangler secret put KASSA_SLEUTEL
+#   npx wrangler secret put BEHEER_SLEUTEL
+#   npx wrangler secret put WEBHOOK_GEHEIM
