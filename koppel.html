@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Solo koppelen</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Poppins', sans-serif; background: linear-gradient(180deg,#f7faff,#cfdcee); color: #162746; min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 20px; box-sizing: border-box; }
+  .kaart { background: #fff; border-radius: 24px; padding: 32px; width: min(480px, 100%); box-shadow: 0 18px 40px -14px rgba(22,39,70,.35); }
+  h1 { margin: 0 0 6px; font-size: 26px; font-weight: 800; }
+  p { margin: 0 0 22px; color: #24406f; font-size: 15px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 6px; }
+  input { width: 100%; box-sizing: border-box; font: inherit; font-size: 17px; padding: 12px 14px; border: 2px solid #cfdcee; border-radius: 12px; }
+  input:focus { outline: none; border-color: #162746; }
+  button { margin-top: 22px; width: 100%; font: inherit; font-weight: 800; font-size: 18px; padding: 14px; border: none; border-radius: 14px; background: #162746; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; }
+  .uitslag { margin-top: 20px; padding: 16px; border-radius: 14px; font-size: 15px; display: none; word-break: break-all; }
+  .uitslag.ok { display: block; background: #e3f6ed; color: #145c3e; }
+  .uitslag.fout { display: block; background: #fbe6e6; color: #8a2222; }
+  code { font-size: 17px; font-weight: 700; background: #fff; padding: 4px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="kaart">
+  <h1>Solo koppelen</h1>
+  <p>Log uit op de Solo, ga naar Verbindingen, API, Verbinden. Vul de code hieronder binnen 5 minuten in.</p>
+
+  <label for="sleutel">Beheersleutel</label>
+  <input id="sleutel" type="password" autocomplete="off">
+
+  <label for="code">Koppelcode van de Solo</label>
+  <input id="code" autocomplete="off" style="text-transform:uppercase;letter-spacing:2px">
+
+  <label for="naam">Naam voor het pinapparaat</label>
+  <input id="naam" value="Zelfscankassa">
+
+  <button id="knop">Koppelen</button>
+  <div class="uitslag" id="uitslag"></div>
+</div>
+<script>
+const API = 'https://zelfscankassa.broad-tree-20cb.workers.dev';
+const uit = document.getElementById('uitslag');
+document.getElementById('knop').onclick = async () => {
+  const knop = document.getElementById('knop');
+  knop.disabled = true; knop.textContent = 'Bezig...';
+  uit.className = 'uitslag';
+  try {
+    const r = await fetch(API + '/api/koppel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Beheer-Sleutel': document.getElementById('sleutel').value.trim() },
+      body: JSON.stringify({ code: document.getElementById('code').value.trim().toUpperCase(), naam: document.getElementById('naam').value.trim() }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.id) {
+      uit.className = 'uitslag ok';
+      uit.innerHTML = 'Gekoppeld! Zet dit nummer in Cloudflare als geheim <b>SUMUP_READER_ID</b>:<br><br><code>' + d.id + '</code>';
+    } else {
+      uit.className = 'uitslag fout';
+      uit.textContent = r.status === 403 ? 'De beheersleutel klopt niet.' : 'Niet gelukt: ' + (d.message || d.detail || d.fout || JSON.stringify(d));
+    }
+  } catch (e) {
+    uit.className = 'uitslag fout';
+    uit.textContent = 'Geen verbinding met het tussenstuk.';
+  }
+  knop.disabled = false; knop.textContent = 'Koppelen';
+};
+</script>
+</body>
+</html>
